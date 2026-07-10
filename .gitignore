@@ -1,0 +1,8 @@
+build/
+build-*/
+*.user
+*.exe
+*.dll
+*.o
+*.obj
+.qmake.stash
