@@ -1,4 +1,5 @@
 #include "loginwindow.h"
+#include "dashboardwindow.h"
 #include "ui_loginwindow.h"
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -22,6 +23,29 @@ LoginWindow::~LoginWindow()
 }
 
 void LoginWindow::onLoginButtonClicked() {
+
+    //-----------Test-------------
+
+    DashboardWindow *window = new DashboardWindow(this);
+    this->hide();
+    window->show();
+
+    //-----------Test-------------
+
+    if (ui->lineEdit->text().isEmpty() && ui->lineEdit_2->text().isEmpty()) {
+        ui->pushButton->setText("Поля не заполнены");
+        return;
+    }
+
+    if (ui->lineEdit->text().isEmpty()) {
+        ui->pushButton->setText("Поле с факультетным номером не заполнено");
+        return;
+    }
+
+    if (ui->lineEdit_2->text().isEmpty()) {
+        ui->pushButton->setText("Поле с паролем не заполнено");
+        return;
+    }
 
     QUrl url("http://20.215.255.122:8000/api/login");
     QNetworkRequest request(url);
@@ -58,8 +82,12 @@ void LoginWindow::onServerResponse(QNetworkReply* reply) {
 
     if (replyJson.contains("status") && replyJson["status"].toString() == "success") {
         ui->pushButton->setText("Войти");
-        QString student = replyJson["student_name"].toString();
-        QMessageBox::information(this, "Успех", "Добро пожаловать, " + student);
+        emit loginSuccessful();
+    }
+    else {
+        ui->pushButton->setText("Войти");
+        QMessageBox::critical(this, "Ошибка", "Ошибка получения данных. Возможно, введен неверный факультетный номер или пароль");
+        return;
     }
 
     reply->deleteLater();

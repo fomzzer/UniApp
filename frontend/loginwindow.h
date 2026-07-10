@@ -20,6 +20,9 @@ public:
     explicit LoginWindow(QWidget *parent = nullptr);
     ~LoginWindow() override;
 
+signals:
+    void loginSuccessful();
+
 private slots:
     void onLoginButtonClicked();
     void onServerResponse(QNetworkReply* reply);
