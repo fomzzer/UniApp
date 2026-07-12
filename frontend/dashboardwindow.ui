@@ -10,6 +10,12 @@
     <height>600</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>600</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Dashboard</string>
   </property>
@@ -75,6 +81,117 @@ QLabel#lbl_name {
     font-family: &quot;Segoe UI&quot;, sans-serif;
     font-size: 22px;
     font-weight: bold;
+}
+
+/* --- SCHEDULE --- */
+
+QComboBox {
+    background-color: #22272E;
+    color: #FFFFFF;
+    border: 1px solid #373E47;
+    border-radius: 6px;
+    padding: 4px 12px;
+    min-height: 32px; 
+    font-family: &quot;Segoe UI&quot;, sans-serif;
+    font-size: 14px;
+}
+
+QComboBox:hover {
+    border: 1px solid #8B949E;
+}
+
+QComboBox:!enabled, QComboBox::drop-down:!enabled {
+    color: #8B949E;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 30px;
+    border-left: 1px solid #373E47; 
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+QComboBox::down-arrow {
+	image: url(:/assets/arrow.svg);
+	width: 16px;
+	height: 16px;
+}
+
+QComboBox::down-arrow:on {
+    top: 1px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #22272E;
+    color: #FFFFFF;
+    border: 1px solid #373E47;
+    border-radius: 4px;
+    selection-background-color: #0056A4;
+    selection-color: #FFFFFF;
+    outline: none; 
+    padding: 4px;
+}
+
+/* --- INFO --- */
+
+QLabel#lbl_info_text {
+    padding: 20px;
+    line-height: 1.6;
+    color: #C9D1D9;
+    font-size: 14px;
+}
+
+QGroupBox {
+    border: 1px solid #30363D;
+    border-radius: 10px;
+    background-color: #161B22;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #FFFFFF;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 10px;
+    padding: 0 5px;
+}
+
+QLabel#lbl_title {
+    font-size: 32px;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin-top: 20px;
+    margin-bottom: 5px;
+}
+
+QLabel#lbl_slogan {
+    font-size: 16px;
+    font-style: italic;
+    color: #58A6FF;
+    margin-bottom: 30px;
+}
+
+/* --- DORM --- */
+
+QLabel#label_7 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #FFFFFF;
+    margin-bottom: 10px;
+    padding-top: 20px;
+}
+
+QLabel#label_8 {
+    font-size: 15px;
+    color: #8B949E;
+    line-height: 1.5;
+    padding: 10px;
+    background-color: #161B22;
+    border-radius: 8px;
+    border: 1px solid #30363D;
 }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -395,9 +512,172 @@ QLabel#lbl_name {
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="page_schedule"/>
-        <widget class="QWidget" name="page_dorm"/>
-        <widget class="QWidget" name="page_info"/>
+        <widget class="QWidget" name="page_schedule">
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <layout class="QVBoxLayout" name="layout_schedule">
+            <item>
+             <widget class="QComboBox" name="combo_faculty"/>
+            </item>
+            <item>
+             <widget class="QComboBox" name="combo_degree"/>
+            </item>
+            <item>
+             <widget class="QComboBox" name="combo_specialty"/>
+            </item>
+            <item>
+             <widget class="QComboBox" name="combo_course"/>
+            </item>
+            <item>
+             <widget class="QComboBox" name="combo_stream"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_open_schedule">
+              <property name="cursor">
+               <cursorShape>PointingHandCursor</cursorShape>
+              </property>
+              <property name="text">
+               <string>Показать</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Orientation::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="page_dorm">
+         <layout class="QVBoxLayout" name="verticalLayout_10">
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <item>
+             <widget class="QLabel" name="label_7">
+              <property name="text">
+               <string>Общежитие</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_8">
+              <property name="text">
+               <string>Информация об общежитии</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_6">
+              <property name="orientation">
+               <enum>Qt::Orientation::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Policy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>350</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="page_info">
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <item>
+             <widget class="QLabel" name="lbl_title">
+              <property name="font">
+               <font>
+                <family>Segoe UI Semibold</family>
+                <pointsize>-1</pointsize>
+                <fontweight>DemiBold</fontweight>
+               </font>
+              </property>
+              <property name="text">
+               <string>UniApp</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lbl_slogan">
+              <property name="text">
+               <string>Make it easy.</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignTop</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox">
+              <property name="title">
+               <string>Техническая информация</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_8">
+               <item>
+                <widget class="QLabel" name="lbl_info_text">
+                 <property name="text">
+                  <string>&lt;p style=&quot;line-height: 160%;&quot;&gt;
+    &lt;span style=&quot;color: #8B949E;&quot;&gt;Версия:&lt;/span&gt; 1.0.0 (Release)&lt;br&gt;
+    &lt;span style=&quot;color: #8B949E;&quot;&gt;Дата сборки:&lt;/span&gt; 12 июля 2026 г.&lt;br&gt;
+    &lt;span style=&quot;color: #8B949E;&quot;&gt;Стек:&lt;/span&gt; C++ / Qt 6.11, Python 3.x&lt;br&gt;
+    &lt;br&gt;
+    &lt;span style=&quot;color: #8B949E;&quot;&gt;Разработчики:&lt;/span&gt; fomzzer, sa1roze&lt;br&gt;
+    &lt;br&gt;
+    &lt;span style=&quot;color: #58A6FF;&quot;&gt;GitHub:&lt;/span&gt; github.com/fomzzer/uniapp&lt;br&gt;
+    &lt;span style=&quot;color: #58A6FF;&quot;&gt;Email:&lt;/span&gt; fomzzer@gmail.com
+&lt;/p&gt;</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Orientation::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Policy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>100</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>

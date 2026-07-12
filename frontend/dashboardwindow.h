@@ -2,6 +2,7 @@
 #define DASHBOARDWINDOW_H
 
 #include <QMainWindow>
+#include <QJsonArray>
 
 namespace Ui {
 class DashboardWindow;
@@ -17,6 +18,13 @@ public:
 
 private:
     Ui::DashboardWindow *ui;
+    QJsonArray m_schedules;
+
+    void loadSchedulesJson();
+    void updateDegrees();
+    void updateFaculties();
+    void updateSpecialties();
+    void updateCoursesAndStreams();
 };
 
 #endif // DASHBOARDWINDOW_H

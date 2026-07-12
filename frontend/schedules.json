@@ -1,0 +1,940 @@
+[
+    {
+        "faculty": "ФА",
+        "specialty": "ИСИГД",
+        "course": "1",
+        "stream": "1",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФА-ИСИГД-1-1-27-01-2026-15-43.pdf"
+    },
+    {
+        "faculty": "ФА",
+        "specialty": "АИУТ",
+        "course": "1",
+        "stream": "1",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФА-АИУТ-1-1-16-02-2026-10-33.pdf"
+    },
+    {
+        "faculty": "ФА",
+        "specialty": "ИСИГД-АЕ",
+        "course": "1",
+        "stream": "1",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФА- ИСИГД-АЕ-1-1-17-02-2026-15-38.pdf"
+    },
+    {
+        "faculty": "ФА",
+        "specialty": "АИУТ",
+        "course": "2",
+        "stream": "1",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФА-АИУТ-2-1-05-02-2026-08-29.pdf"
+    },
+    {
+        "faculty": "ФА",
+        "specialty": "ИСИГД",
+        "course": "2",
+        "stream": "1",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФА-ИСИГД-2-1-05-02-2026-08-30.pdf"
+    },
+    {
+        "faculty": "ФА",
+        "specialty": "АИУТ",
+        "course": "3",
+        "stream": "1",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФА-АИУТ-3-1-05-02-2026-12-31.pdf"
+    },
+    {
+        "faculty": "ФА",
+        "specialty": "АИУТ",
+        "course": "4",
+        "stream": "1",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФА-АИУТ-4-1-29-01-2026-17-19.pdf"
+    },
+    {
+        "faculty": "ЕФ",
+        "specialty": "EEEO",
+        "course": "1",
+        "stream": "2",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕФ-EEEO-1-2-03-02-2026-15-20.pdf"
+    },
+    {
+        "faculty": "ЕФ",
+        "specialty": "ET",
+        "course": "1",
+        "stream": "2",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕФ-ET-1-2-27-01-2026-15-40.pdf"
+    },
+    {
+        "faculty": "ЕФ",
+        "specialty": "ЕЕЕО",
+        "course": "2",
+        "stream": "2",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕФ-ЕЕЕО-2-2-05-02-2026-08-25.pdf"
+    },
+    {
+        "faculty": "ЕФ",
+        "specialty": "ЕТ",
+        "course": "2",
+        "stream": "2",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕФ-ЕТ-2-2-05-02-2026-12-35.pdf"
+    },
+    {
+        "faculty": "ЕФ",
+        "specialty": "ЕЕЕО",
+        "course": "3",
+        "stream": "2",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕФ-ЕЕЕО-3-2-06-02-2026-16-07.pdf"
+    },
+    {
+        "faculty": "ЕФ",
+        "specialty": "ЕТ",
+        "course": "3",
+        "stream": "2",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕФ-ЕТ-3-2-26-01-2026-18-37.pdf"
+    },
+    {
+        "faculty": "ЕФ",
+        "specialty": "ЕЕЕО",
+        "course": "4",
+        "stream": "2",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕФ-ЕЕЕО-4-2-27-01-2026-09-07.pdf"
+    },
+    {
+        "faculty": "ЕФ",
+        "specialty": "ЕТ",
+        "course": "4",
+        "stream": "2",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕФ-ЕТ-4-2-27-01-2026-15-50.pdf"
+    },
+    {
+        "faculty": "ЕМФ",
+        "specialty": "ДТОТ",
+        "course": "1",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕМФ-ДТОТ-1-3-11-02-2026-18-41.pdf"
+    },
+    {
+        "faculty": "ЕМФ",
+        "specialty": "ТЕЯЕ",
+        "course": "1",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕМФ-ТЕЯЕ-1-3-12-02-2026-16-32.pdf"
+    },
+    {
+        "faculty": "ЕМФ",
+        "specialty": "ТХТС",
+        "course": "1",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕМФ-ТХТС-1-3-04-02-2026-15-36.pdf"
+    },
+    {
+        "faculty": "ЕМФ",
+        "specialty": "ВЕТФТ",
+        "course": "1",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕМФ-ВЕТФТ-1-3-12-02-2026-16-35.pdf"
+    },
+    {
+        "faculty": "ЕМФ",
+        "specialty": "ТХТС",
+        "course": "2",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕМФ-ТХТС-2-3-25-03-2026-14-44.pdf"
+    },
+    {
+        "faculty": "ЕМФ",
+        "specialty": "ТЕЯЕ",
+        "course": "2",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕМФ-ТЕЯЕ-2-3-12-02-2026-11-31.pdf"
+    },
+    {
+        "faculty": "ЕМФ",
+        "specialty": "ВЕТФТ",
+        "course": "2",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕМФ-ВЕТФТ-2-3-12-02-2026-11-31.pdf"
+    },
+    {
+        "faculty": "ЕМФ",
+        "specialty": "ДТОТ",
+        "course": "2",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕМФ-ДТОТ-2-3-03-02-2026-15-16.pdf"
+    },
+    {
+        "faculty": "ЕМФ",
+        "specialty": "ТЕЯЕ",
+        "course": "3",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕМФ-ТЕЯЕ-3-3-26-01-2026-15-04.pdf"
+    },
+    {
+        "faculty": "ЕМФ",
+        "specialty": "ТХТС",
+        "course": "3",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕМФ-ТХТС-3-3-26-01-2026-15-08.pdf"
+    },
+    {
+        "faculty": "ЕМФ",
+        "specialty": "ВЕТФТ",
+        "course": "4",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕМФ-ВЕТФТ-4-3-26-01-2026-15-02.pdf"
+    },
+    {
+        "faculty": "ЕМФ",
+        "specialty": "ТЕЯЕ",
+        "course": "4",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕМФ-ТЕЯЕ-4-3-26-01-2026-15-06.pdf"
+    },
+    {
+        "faculty": "ЕМФ",
+        "specialty": "ТХТС",
+        "course": "4",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ЕМФ-ТХТС-4-3-26-01-2026-15-09.pdf"
+    },
+    {
+        "faculty": "ФИТ",
+        "specialty": "ДИТ",
+        "course": "1",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФИТ-ДИТ-1-3-04-02-2026-15-37.pdf"
+    },
+    {
+        "faculty": "ФИТ",
+        "specialty": "ИСИИ-AE",
+        "course": "1",
+        "stream": "20",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФИТ- ИСИИ-AE-1-20-20-02-2026-12-12.pdf"
+    },
+    {
+        "faculty": "ФИТ",
+        "specialty": "ИСИИ",
+        "course": "1",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФИТ- ИСИИ-1-3-16-02-2026-09-49.pdf"
+    },
+    {
+        "faculty": "ФИТ",
+        "specialty": "КПТМ",
+        "course": "1",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФИТ-КПТМ-1-3-04-02-2026-15-37.pdf"
+    },
+    {
+        "faculty": "ФИТ",
+        "specialty": "ИСИИ",
+        "course": "2",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФИТ-ИСИИ-2-3-16-02-2026-10-31.pdf"
+    },
+    {
+        "faculty": "ФИТ",
+        "specialty": "ИСИИ-АЕ",
+        "course": "2",
+        "stream": "20",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФИТ-ИСИИ-АЕ-2-20-11-02-2026-18-12.pdf"
+    },
+    {
+        "faculty": "ФИТ",
+        "specialty": "КПТМ",
+        "course": "2",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФИТ-КПТМ-2-3-12-02-2026-11-30.pdf"
+    },
+    {
+        "faculty": "ФИТ",
+        "specialty": "ДИТ",
+        "course": "2",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФИТ-ДИТ-2-3-12-02-2026-11-30.pdf"
+    },
+    {
+        "faculty": "ФИТ",
+        "specialty": "ИСИИ",
+        "course": "3",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФИТ-ИСИИ-3-3-04-03-2026-14-59.pdf"
+    },
+    {
+        "faculty": "ФИТ",
+        "specialty": "ИСИИ-АЕ",
+        "course": "3",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФИТ-ИСИИ-АЕ-3-3-04-03-2026-14-59.pdf"
+    },
+    {
+        "faculty": "ФИТ",
+        "specialty": "КПТМ",
+        "course": "3",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФИТ-КПТМ-3-3-25-02-2026-11-11.pdf"
+    },
+    {
+        "faculty": "ФИТ",
+        "specialty": "ДИТ",
+        "course": "3",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФИТ-ДИТ-3-3-10-02-2026-10-28.pdf"
+    },
+    {
+        "faculty": "ФИТ",
+        "specialty": "ДИТ",
+        "course": "4",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФИТ-ДИТ-4---06-02-2026-13-35.pdf"
+    },
+    {
+        "faculty": "ФИТ",
+        "specialty": "ИСИИ-АЕ",
+        "course": "4",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФИТ-ИСИИ-АЕ-4-3-26-02-2026-12-12.pdf"
+    },
+    {
+        "faculty": "ФИТ",
+        "specialty": "ИСИИ",
+        "course": "4",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФИТ-ИСИИ-4-3-26-02-2026-12-12.pdf"
+    },
+    {
+        "faculty": "ФИТ",
+        "specialty": "КПТМ",
+        "course": "4",
+        "stream": "3",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФИТ-КПТМ-4-3-12-02-2026-17-03.pdf"
+    },
+    {
+        "faculty": "МФ",
+        "specialty": "ИД",
+        "course": "1",
+        "stream": "5",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/МФ-ИД-1-5-04-02-2026-15-37.pdf"
+    },
+    {
+        "faculty": "МФ",
+        "specialty": "ИЛ",
+        "course": "1",
+        "stream": "5",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/МФ-ИЛ-1-5-04-02-2026-15-38.pdf"
+    },
+    {
+        "faculty": "МФ",
+        "specialty": "МАШ",
+        "course": "1",
+        "stream": "4",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/МФ-МАШ-1-4-16-02-2026-09-13.pdf"
+    },
+    {
+        "faculty": "МФ",
+        "specialty": "МЕХ.",
+        "course": "1",
+        "stream": "4",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/МФ-МЕХ.-1-4-27-01-2026-14-45.pdf"
+    },
+    {
+        "faculty": "МФ",
+        "specialty": "ИД",
+        "course": "2",
+        "stream": "5",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/МФ-ИД-2-5-17-02-2026-16-19.pdf"
+    },
+    {
+        "faculty": "МФ",
+        "specialty": "Маш.",
+        "course": "2",
+        "stream": "4",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/МФ-Маш.-2-4-26-01-2026-16-42.pdf"
+    },
+    {
+        "faculty": "МФ",
+        "specialty": "Мехатр.",
+        "course": "2",
+        "stream": "4",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/МФ-Мехатр.-2-4-29-01-2026-11-46.pdf"
+    },
+    {
+        "faculty": "МФ",
+        "specialty": "ИЛ",
+        "course": "2",
+        "stream": "5",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/МФ-ИЛ-2-5-03-02-2026-07-30.pdf"
+    },
+    {
+        "faculty": "МФ",
+        "specialty": "ИД",
+        "course": "3",
+        "stream": "5",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/МФ-ИД-3-5-17-02-2026-16-19.pdf"
+    },
+    {
+        "faculty": "МФ",
+        "specialty": "ИЛ",
+        "course": "3",
+        "stream": "5",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/МФ-ИЛ-3-5-11-02-2026-11-39.pdf"
+    },
+    {
+        "faculty": "МФ",
+        "specialty": "Маш.",
+        "course": "3",
+        "stream": "4",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/МФ-Маш.-3-4-11-02-2026-15-00.pdf"
+    },
+    {
+        "faculty": "МФ",
+        "specialty": "Мехатр.",
+        "course": "3",
+        "stream": "4",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/МФ-Мехатр.-3-4-10-03-2026-11-47.pdf"
+    },
+    {
+        "faculty": "МФ",
+        "specialty": "ИД",
+        "course": "4",
+        "stream": "5",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/МФ-ИД-4-5-30-01-2026-14-37.pdf"
+    },
+    {
+        "faculty": "МФ",
+        "specialty": "ИЛ",
+        "course": "4",
+        "stream": "4",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/МФ-ИЛ-4-4-20-02-2026-10-45.pdf"
+    },
+    {
+        "faculty": "МФ",
+        "specialty": "Маш.",
+        "course": "4",
+        "stream": "4",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/МФ-Маш.-4-4-17-02-2026-15-37.pdf"
+    },
+    {
+        "faculty": "МФ",
+        "specialty": "Мехатр.",
+        "course": "4",
+        "stream": "4",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/МФ-Мехатр.-4-4-11-02-2026-15-15.pdf"
+    },
+    {
+        "faculty": "ФЕТТ",
+        "specialty": "Авт.Ел",
+        "course": "1",
+        "stream": "6",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФЕТТ-Авт.Ел-1-6-27-01-2026-07-24.pdf"
+    },
+    {
+        "faculty": "ФЕТТ",
+        "specialty": "ЕИС",
+        "course": "1",
+        "stream": "7",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФЕТТ-ЕИС-1-7-06-02-2026-16-10.pdf"
+    },
+    {
+        "faculty": "ФЕТТ",
+        "specialty": "АЕ",
+        "course": "2",
+        "stream": "6",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФЕТТ-АЕ-2-6-26-01-2026-16-53.pdf"
+    },
+    {
+        "faculty": "ФЕТТ",
+        "specialty": "EИС",
+        "course": "2",
+        "stream": "7",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФЕТТ-EИС-2-7-27-01-2026-14-49.pdf"
+    },
+    {
+        "faculty": "ФЕТТ",
+        "specialty": "АЕ",
+        "course": "3",
+        "stream": "18",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФЕТТ-АЕ-3-18-06-02-2026-13-33.pdf"
+    },
+    {
+        "faculty": "ФЕТТ",
+        "specialty": "ЕИС",
+        "course": "3",
+        "stream": "7",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФЕТТ-ЕИС-3-7-04-02-2026-11-27.pdf"
+    },
+    {
+        "faculty": "ФЕТТ",
+        "specialty": "АЕ",
+        "course": "4",
+        "stream": "6",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФЕТТ-АЕ-4-6-12-02-2026-14-53.pdf"
+    },
+    {
+        "faculty": "ФЕТТ",
+        "specialty": "Ел.",
+        "course": "4",
+        "stream": "6",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФЕТТ-Ел.-4-6-04-02-2026-12-09.pdf"
+    },
+    {
+        "faculty": "ФТК",
+        "specialty": "ТК",
+        "course": "1",
+        "stream": "7",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТК-ТК-1-7-27-01-2026-07-39.pdf"
+    },
+    {
+        "faculty": "ФТК",
+        "specialty": "ТК",
+        "course": "2",
+        "stream": "7",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТК-ТК-2-7-06-02-2026-16-09.pdf"
+    },
+    {
+        "faculty": "ФТК",
+        "specialty": "ТК",
+        "course": "3",
+        "stream": "7",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТК-ТК-3-7-27-01-2026-08-44.pdf"
+    },
+    {
+        "faculty": "ФТК",
+        "specialty": "ТК",
+        "course": "4",
+        "stream": "7",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТК-ТК-4-7-30-01-2026-12-07.pdf"
+    },
+    {
+        "faculty": "ФТК",
+        "specialty": "ТК",
+        "course": "4",
+        "stream": "8",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТК-ТК-4-8-11-02-2026-15-17.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "ИТИ",
+        "course": "1",
+        "stream": "10",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-ИТИ-1-10-27-02-2026-15-02.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "КСИ",
+        "course": "1",
+        "stream": "8",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-КСИ-1-8-13-03-2026-15-28.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "КСИ",
+        "course": "1",
+        "stream": "9",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-КСИ-1-9-13-03-2026-15-29.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "КСиг",
+        "course": "1",
+        "stream": "10",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-КСиг-1-10-17-02-2026-15-38.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "КНИ-АЕ",
+        "course": "1",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-КНИ-АЕ-1---18-02-2026-14-45.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "КНИ-АЕ",
+        "course": "2",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-КНИ-АЕ-2---13-02-2026-16-34.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "ИТИ",
+        "course": "2",
+        "stream": "10",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-ИТИ-2-10-30-01-2026-10-01.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "КСИ",
+        "course": "2",
+        "stream": "8",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-КСИ-2-8-16-02-2026-13-48.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "КСИ",
+        "course": "2",
+        "stream": "9",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-КСИ-2-9-16-02-2026-13-48.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "КСиг.",
+        "course": "2",
+        "stream": "10",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-КСиг.-2-10-11-02-2026-11-40.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "КСиг",
+        "course": "3",
+        "stream": "10",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-КСиг-3-10-27-01-2026-07-50.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "КСИ",
+        "course": "3",
+        "stream": "9",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-КСИ-3-9-20-02-2026-17-09.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "КСИ",
+        "course": "3",
+        "stream": "8",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-КСИ-3-8-27-01-2026-07-54.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "ИТИ",
+        "course": "3",
+        "stream": "10",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-ИТИ-3-10-12-02-2026-10-51.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "КНИ-АЕ",
+        "course": "3",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-КНИ-АЕ-3---17-03-2026-09-24.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "КНИ-АЕ",
+        "course": "4",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-КНИ-АЕ-4---13-02-2026-16-38.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "ИТИ",
+        "course": "4",
+        "stream": "10",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-ИТИ-4-10-13-02-2026-16-05.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "КСИ",
+        "course": "4",
+        "stream": "8",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-КСИ-4-8-06-03-2026-07-41.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "КСИ",
+        "course": "4",
+        "stream": "9",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-КСИ-4-9-04-03-2026-15-00.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "КСиг.",
+        "course": "4",
+        "stream": "10",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-КСиг.-4-10-13-02-2026-16-11.pdf"
+    },
+    {
+        "faculty": "ФТ",
+        "specialty": "АЕ.Инж",
+        "course": "1",
+        "stream": "11",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТ-АЕ.Инж-1-11-19-02-2026-15-58.pdf"
+    },
+    {
+        "faculty": "ФТ",
+        "specialty": "АТТ",
+        "course": "1",
+        "stream": "11",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТ-АТТ-1-11-09-04-2026-16-41.pdf"
+    },
+    {
+        "faculty": "ФТ",
+        "specialty": "ТрТТ",
+        "course": "1",
+        "stream": "11",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТ-ТрТТ-1-11-09-04-2026-16-41.pdf"
+    },
+    {
+        "faculty": "ФТ",
+        "specialty": "ТУТ",
+        "course": "1",
+        "stream": "11",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТ-ТУТ-1-11-09-04-2026-16-31.pdf"
+    },
+    {
+        "faculty": "ФТ",
+        "specialty": "АТТ",
+        "course": "2",
+        "stream": "11",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТ-АТТ-2-11-26-01-2026-17-03.pdf"
+    },
+    {
+        "faculty": "ФТ",
+        "specialty": "ТрТТ",
+        "course": "2",
+        "stream": "11",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТ-ТрТТ-2-11-26-01-2026-17-04.pdf"
+    },
+    {
+        "faculty": "ФТ",
+        "specialty": "ТУТ",
+        "course": "2",
+        "stream": "11",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТ-ТУТ-2-11-26-01-2026-17-05.pdf"
+    },
+    {
+        "faculty": "ФТ",
+        "specialty": "Аерокосмич.инж.",
+        "course": "2",
+        "stream": "11",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТ-Аерокосмич.инж.-2-11-11-03-2026-14-20.pdf"
+    },
+    {
+        "faculty": "ФТ",
+        "specialty": "ТрТТ",
+        "course": "3",
+        "stream": "11",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТ-ТрТТ-3-11-11-02-2026-15-19.pdf"
+    },
+    {
+        "faculty": "ФТ",
+        "specialty": "АТТ",
+        "course": "3",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТ---3-АТТ-27-01-2026-07-51.pdf"
+    },
+    {
+        "faculty": "ФТ",
+        "specialty": "ТрТТ",
+        "course": "4",
+        "stream": "11",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТ-ТрТТ-4-11-26-01-2026-19-23.pdf"
+    },
+    {
+        "faculty": "ФТ",
+        "specialty": "ТУТ",
+        "course": "4",
+        "stream": "11",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТ-ТУТ-4-11-27-01-2026-11-38.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "БУ",
+        "course": "1",
+        "stream": "13",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/СФ-БУ-1-13-05-03-2026-11-35.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "ИМ",
+        "course": "1",
+        "stream": "12",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/СФ-ИМ-1-12-11-02-2026-13-28.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "МБИС",
+        "course": "1",
+        "stream": "12",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/СФ-МБИС-1-12-11-02-2026-13-28.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "МБИС",
+        "course": "2",
+        "stream": "12",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/СФ-МБИС-2-12-03-04-2026-10-14.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "ИМ",
+        "course": "2",
+        "stream": "12",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/СФ-ИМ-2-12-28-01-2026-16-01.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "СУ",
+        "course": "2",
+        "stream": "13",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/СФ-СУ-2-13-17-02-2026-08-34.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "ИМ",
+        "course": "3",
+        "stream": "12",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/СФ-ИМ-3-12-10-02-2026-14-45.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "МБИС",
+        "course": "3",
+        "stream": "12",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/СФ-МБИС-3-12-30-03-2026-14-54.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "СУ",
+        "course": "3",
+        "stream": "13",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/СФ-СУ-3-13-04-02-2026-09-50.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "КНИ-АЕ",
+        "course": "4",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/СФ-КНИ-АЕ-4---06-02-2026-12-11.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "ИМ",
+        "course": "4",
+        "stream": "12",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/СФ-ИМ-4-12-12-03-2026-14-28.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "МБИС",
+        "course": "4",
+        "stream": "12",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/СФ-МБИС-4-12-29-01-2026-17-16.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "СУ",
+        "course": "4",
+        "stream": "13",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/СФ-СУ-4-13-04-02-2026-09-54.pdf"
+    },
+    {
+        "faculty": "ФПМИ",
+        "specialty": "АД",
+        "course": "1",
+        "stream": "14",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФПМИ-АД-1-14-17-02-2026-11-48.pdf"
+    },
+    {
+        "faculty": "ФПМИ",
+        "specialty": "ИСН",
+        "course": "1",
+        "stream": "16",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФПМИ-ИСН-1-16-09-02-2026-11-48.pdf"
+    },
+    {
+        "faculty": "ФПМИ",
+        "specialty": "ПФКМ",
+        "course": "1",
+        "stream": "15",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФПМИ-ПФКМ-1-15-11-02-2026-18-44.pdf"
+    },
+    {
+        "faculty": "ФПМИ",
+        "specialty": "ПМИ",
+        "course": "1",
+        "stream": "14",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФПМИ-ПМИ-1-14-12-03-2026-14-07.pdf"
+    },
+    {
+        "faculty": "ФПМИ",
+        "specialty": "ИСН",
+        "course": "2",
+        "stream": "16",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФПМИ-ИСН-2-16-02-03-2026-12-35.pdf"
+    },
+    {
+        "faculty": "ФПМИ",
+        "specialty": "ПМИ",
+        "course": "2",
+        "stream": "14",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФПМИ-ПМИ-2-14-09-02-2026-10-12.pdf"
+    },
+    {
+        "faculty": "ФПМИ",
+        "specialty": "АД",
+        "course": "2",
+        "stream": "14",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФПМИ-АД-2-14-27-02-2026-12-07.pdf"
+    },
+    {
+        "faculty": "ФПМИ",
+        "specialty": "ПМИ",
+        "course": "3",
+        "stream": "14",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФПМИ-ПМИ-3-14-17-02-2026-10-46.pdf"
+    },
+    {
+        "faculty": "ФПМИ",
+        "specialty": "ИСН",
+        "course": "3",
+        "stream": "15",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФПМИ-ИСН-3-15-17-02-2026-11-23.pdf"
+    },
+    {
+        "faculty": "ФПМИ",
+        "specialty": "АД",
+        "course": "4",
+        "stream": "14",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФПМИ-АД-4-14-18-02-2026-12-29.pdf"
+    },
+    {
+        "faculty": "ФПМИ",
+        "specialty": "ИСН",
+        "course": "4",
+        "stream": "15",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФПМИ-ИСН-4-15-12-02-2026-14-49.pdf"
+    },
+    {
+        "faculty": "ФПМИ",
+        "specialty": "ПМИ",
+        "course": "4",
+        "stream": "14",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФПМИ-ПМИ-4-14-26-01-2026-19-21.pdf"
+    },
+    {
+        "faculty": "ФАИО",
+        "specialty": "ИИАЕ",
+        "course": "1",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФАИО-ИИАЕ-1---17-02-2026-08-35.pdf"
+    },
+    {
+        "faculty": "ФАИО",
+        "specialty": "ИИАЕ",
+        "course": "2",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФАИО-ИИАЕ-2---19-02-2026-07-57.pdf"
+    },
+    {
+        "faculty": "ФАИО",
+        "specialty": "ИИАЕ",
+        "course": "3",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФАИО-ИИАЕ-3---11-02-2026-15-03.pdf"
+    },
+    {
+        "faculty": "ФАИО",
+        "specialty": "ИИАЕ",
+        "course": "4",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФАИО-ИИАЕ-4---25-02-2026-16-31.pdf"
+    }
+]

@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>assets/logo_tu.png</file>
+        <file>assets/arrow.svg</file>
     </qresource>
 </RCC>
