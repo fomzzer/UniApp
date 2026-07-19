@@ -15,7 +15,7 @@ def scrap_tu_sofia(credentials: LoginData):
     headers = {"User-Agent": "Mozilla/5.0"}
 
     data = {
-        'fnum': credentials.fuculty_no,
+        'fnum': credentials.faculty_no,
         'd_f_i': credentials.auth_code
     }
 
