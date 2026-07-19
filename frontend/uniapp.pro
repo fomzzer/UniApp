@@ -28,4 +28,6 @@ RESOURCES += \
     resources.qrc
 
 DISTFILES += \
+    ../backend/full_scraper.py \
+    ../backend/scraper.py \
     scraper.py

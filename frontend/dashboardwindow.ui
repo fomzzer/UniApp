@@ -517,19 +517,50 @@ QLabel#label_8 {
           <item>
            <layout class="QVBoxLayout" name="layout_schedule">
             <item>
-             <widget class="QComboBox" name="combo_faculty"/>
+             <widget class="QComboBox" name="combo_faculty">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>-1</pointsize>
+               </font>
+              </property>
+             </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="combo_degree"/>
+             <widget class="QComboBox" name="combo_specialty">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>-1</pointsize>
+               </font>
+              </property>
+              <property name="currentIndex">
+               <number>-1</number>
+              </property>
+             </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="combo_specialty"/>
+             <widget class="QComboBox" name="combo_course">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>-1</pointsize>
+               </font>
+              </property>
+             </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="combo_course"/>
-            </item>
-            <item>
-             <widget class="QComboBox" name="combo_stream"/>
+             <widget class="QComboBox" name="combo_stream">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>-1</pointsize>
+               </font>
+              </property>
+              <property name="currentIndex">
+               <number>-1</number>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QPushButton" name="btn_open_schedule">
@@ -537,7 +568,14 @@ QLabel#label_8 {
                <cursorShape>PointingHandCursor</cursorShape>
               </property>
               <property name="text">
-               <string>Показать</string>
+               <string>Показать расписание</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_update_data">
+              <property name="text">
+               <string>Обновить данные</string>
               </property>
              </widget>
             </item>
@@ -645,7 +683,7 @@ QLabel#label_8 {
                   <string>&lt;p style=&quot;line-height: 160%;&quot;&gt;
     &lt;span style=&quot;color: #8B949E;&quot;&gt;Версия:&lt;/span&gt; 1.0.0 (Release)&lt;br&gt;
     &lt;span style=&quot;color: #8B949E;&quot;&gt;Дата сборки:&lt;/span&gt; 12 июля 2026 г.&lt;br&gt;
-    &lt;span style=&quot;color: #8B949E;&quot;&gt;Стек:&lt;/span&gt; C++ / Qt 6.11, Python 3.x&lt;br&gt;
+    &lt;span style=&quot;color: #8B949E;&quot;&gt;Стек:&lt;/span&gt; C++ / Qt 6.11, Python 3.14.6&lt;br&gt;
     &lt;br&gt;
     &lt;span style=&quot;color: #8B949E;&quot;&gt;Разработчики:&lt;/span&gt; fomzzer, sa1roze&lt;br&gt;
     &lt;br&gt;

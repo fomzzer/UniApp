@@ -25,6 +25,9 @@ private:
     void updateFaculties();
     void updateSpecialties();
     void updateCoursesAndStreams();
+
+private slots:
+    void startPythonScrapper();
 };
 
 #endif // DASHBOARDWINDOW_H

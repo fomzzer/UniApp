@@ -24,14 +24,6 @@ LoginWindow::~LoginWindow()
 
 void LoginWindow::onLoginButtonClicked() {
 
-    //-----------Test-------------
-
-    DashboardWindow *window = new DashboardWindow(this);
-    this->hide();
-    window->show();
-
-    //-----------Test-------------
-
     if (ui->lineEdit->text().isEmpty() && ui->lineEdit_2->text().isEmpty()) {
         ui->pushButton->setText("Поля не заполнены");
         return;
@@ -52,8 +44,8 @@ void LoginWindow::onLoginButtonClicked() {
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     QJsonObject json;
-    json["facultyno"] = ui->lineEdit->text();
-    json["pass"] = ui->lineEdit_2->text();
+    json["faculty_no"] = ui->lineEdit->text();
+    json["auth_code"] = ui->lineEdit_2->text();
 
     QJsonDocument doc(json);
     QByteArray data = doc.toJson();

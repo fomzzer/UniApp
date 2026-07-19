@@ -49,6 +49,13 @@
         "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФА-АИУТ-4-1-29-01-2026-17-19.pdf"
     },
     {
+        "faculty": "ФА",
+        "specialty": "АИУТ",
+        "course": "1",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФА-АИУТ-1---06-02-2026-08-22.pdf"
+    },
+    {
         "faculty": "ЕФ",
         "specialty": "EEEO",
         "course": "1",
@@ -476,6 +483,34 @@
         "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФЕТТ-Ел.-4-6-04-02-2026-12-09.pdf"
     },
     {
+        "faculty": "ФЕТТ",
+        "specialty": "Електроника",
+        "course": "1",
+        "stream": "210",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФЕТТ-Електроника-1-210-06-02-2026-11-40.pdf"
+    },
+    {
+        "faculty": "ФЕТТ",
+        "specialty": "ЕСХЕ",
+        "course": "1",
+        "stream": "210",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФЕТТ-ЕСХЕ-1-210-06-02-2026-11-44.pdf"
+    },
+    {
+        "faculty": "ФЕТТ",
+        "specialty": "МТНИ",
+        "course": "1",
+        "stream": "210",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФЕТТ-МТНИ-1-210-06-02-2026-11-48.pdf"
+    },
+    {
+        "faculty": "ФЕТТ",
+        "specialty": "ИСДОМ",
+        "course": "1",
+        "stream": "210",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФЕТТ-ИСДОМ-1-210-06-02-2026-11-53.pdf"
+    },
+    {
         "faculty": "ФТК",
         "specialty": "ТК",
         "course": "1",
@@ -509,6 +544,34 @@
         "course": "4",
         "stream": "8",
         "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФТК-ТК-4-8-11-02-2026-15-17.pdf"
+    },
+    {
+        "faculty": "ФТК",
+        "specialty": "АКК",
+        "course": "1",
+        "stream": "211",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФТК-АКК-1-211-06-02-2026-11-16.pdf"
+    },
+    {
+        "faculty": "ФТК",
+        "specialty": "КИМ",
+        "course": "1",
+        "stream": "211",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФТК-КИМ-1-211-11-02-2026-18-08.pdf"
+    },
+    {
+        "faculty": "ФТК",
+        "specialty": "ТК",
+        "course": "1",
+        "stream": "211",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФТК-ТК-1-211-06-02-2026-11-19.pdf"
+    },
+    {
+        "faculty": "ФТК",
+        "specialty": "К3DТ",
+        "course": "1",
+        "stream": "211",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФТК-К3DТ-1-211-06-02-2026-11-22.pdf"
     },
     {
         "faculty": "ФКСТ",
@@ -649,6 +712,13 @@
         "course": "4",
         "stream": "10",
         "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФКСТ-КСиг.-4-10-13-02-2026-16-11.pdf"
+    },
+    {
+        "faculty": "ФКСТ",
+        "specialty": "КСИ",
+        "course": "1",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФКСТ-КСИ-1---13-02-2026-16-45.pdf"
     },
     {
         "faculty": "ФТ",
@@ -826,6 +896,48 @@
         "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/СФ-СУ-4-13-04-02-2026-09-54.pdf"
     },
     {
+        "faculty": "СФ",
+        "specialty": "БУ",
+        "course": "1",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/СФ-БУ-1---26-02-2026-17-26.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "ИМ",
+        "course": "1",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/СФ-ИМ-1---26-02-2026-17-32.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "ТП",
+        "course": "1",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/СФ-ТП-1---19-03-2026-11-01.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "УП",
+        "course": "1",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/СФ-УП-1---19-03-2026-11-01.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "ИСИ",
+        "course": "1",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/СФ-ИСИ-1---09-02-2026-17-56.pdf"
+    },
+    {
+        "faculty": "СФ",
+        "specialty": "МБИС",
+        "course": "1",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/СФ-МБИС-1---20-04-2026-18-39.pdf"
+    },
+    {
         "faculty": "ФПМИ",
         "specialty": "АД",
         "course": "1",
@@ -910,6 +1022,62 @@
         "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФПМИ-ПМИ-4-14-26-01-2026-19-21.pdf"
     },
     {
+        "faculty": "ФПМИ",
+        "specialty": "АГМПД",
+        "course": "1",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФПМИ-АГМПД-1---09-02-2026-18-07.pdf"
+    },
+    {
+        "faculty": "ФПМИ",
+        "specialty": "ИСН",
+        "course": "1",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФПМИ-ИСН-1---09-02-2026-18-08.pdf"
+    },
+    {
+        "faculty": "ФПМИ",
+        "specialty": "ПМИ",
+        "course": "1",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФПМИ-ПМИ-1---09-02-2026-18-09.pdf"
+    },
+    {
+        "faculty": "ФФОЕ",
+        "specialty": "Електроинженерство-ФЕ",
+        "course": "1",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФФОЕ-Електроинженерство-ФЕ-1---02-02-2026-08-47.pdf"
+    },
+    {
+        "faculty": "ФФОЕ",
+        "specialty": "Електроинженерство-ФЕ",
+        "course": "2",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФФОЕ-Електроинженерство-ФЕ-2---02-02-2026-08-48.pdf"
+    },
+    {
+        "faculty": "ФФОЕ",
+        "specialty": "Електроинженерство-ФЕ",
+        "course": "3",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФФОЕ-Електроинженерство-ФЕ-3---02-02-2026-08-49.pdf"
+    },
+    {
+        "faculty": "ФФОЕ",
+        "specialty": "EEA",
+        "course": "4",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФФОЕ-EEA-4---02-02-2026-08-51.pdf"
+    },
+    {
+        "faculty": "ФФОЕ",
+        "specialty": "IC",
+        "course": "4",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФФОЕ-IC-4---02-02-2026-08-52.pdf"
+    },
+    {
         "faculty": "ФАИО",
         "specialty": "ИИАЕ",
         "course": "1",
@@ -936,5 +1104,12 @@
         "course": "4",
         "stream": "-",
         "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/bakalavar/ФАИО-ИИАЕ-4---25-02-2026-16-31.pdf"
+    },
+    {
+        "faculty": "ФАИО",
+        "specialty": "IBTM",
+        "course": "1",
+        "stream": "-",
+        "url": "https://tu-sofia.bg/weeklyprogram/2025-2026-leten/magistar/ФАИО-IBTM-1---17-02-2026-15-36.pdf"
     }
 ]

@@ -5,17 +5,14 @@ import os
 import time
 
 def fetch_all_schedules():
+
     url = "https://tu-sofia.bg/university/weeklyprograms"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-    }
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
     all_schedules = []
 
-    print("Начинаем умный сбор расписания...")
-
     for faculty_id in range(1, 35):
-        print(f"Факультет ID {faculty_id}...", end="", flush=True)
+        print(f"Faculty ID {faculty_id}...", end="", flush=True)
 
         form_data = {
             "Faculty[id]": str(faculty_id)
@@ -40,7 +37,6 @@ def fetch_all_schedules():
             count = 0
 
             for idx, table in enumerate(valid_tables):
-                degree_name = "Бакалавър" if idx == 0 else "Магистър"
 
                 if "Няма намерени резултати" in table.text:
                     continue
@@ -62,7 +58,6 @@ def fetch_all_schedules():
                                 pdf_url = "https://tu-sofia.bg" + pdf_url
 
                             all_schedules.append({
-                                "degree": degree_name,
                                 "faculty": faculty,
                                 "specialty": specialty,
                                 "course": course,
@@ -71,7 +66,6 @@ def fetch_all_schedules():
                             })
                             count += 1
 
-            print(f" найдено записей: {count}")
             time.sleep(0.5)
 
         except Exception as e:
@@ -84,8 +78,6 @@ def fetch_all_schedules():
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(all_schedules, f, ensure_ascii=False, indent=4)
 
-    print(f"\nГотово! Собрано всего {len(all_schedules)} расписаний.")
-    print(f"Данные сохранены в: {json_path}")
 
 if __name__ == "__main__":
     fetch_all_schedules()
