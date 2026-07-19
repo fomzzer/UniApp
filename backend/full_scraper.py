@@ -28,12 +28,30 @@ def scrap_tu_sofia(credentials: LoginData):
 
         if logout_btn:
             full_name = logout_btn.parent.text.strip()
+            all_info = {}
+            info_table = soup.find('table', id='info')
+
+            if info_table:
+                for row in info_table.find_all('tr'):
+                    cells = row.find_all('td')
+
+                    for i in range(0, len(cells) - 1, 2):
+                        key_element = cells[i]
+                        val_element = cells[i+1]
+
+                        key = key_element.text.replace('\xa0', ' ').strip().rstrip(':').strip()
+                        val_strings = list(val_element.stripped_strings)
+                        val = val_strings[0].replace('"', '') if val_strings else ""
+
+                        if key:
+                            all_info[key] = val
 
             return {
                 'status': 'success',
-                'name': full_name
+                'name': full_name,
+                'info': all_info
             }
         else:
-            return {'status': 'error', 'message': "Failed to parse name"}
+            return {'status': 'error', 'message': "Failed to parse information"}
     else:
         return {'status': 'error', 'message': "Invalid credentials"}

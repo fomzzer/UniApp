@@ -390,7 +390,7 @@ QLabel#label_8 {
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_2">
+             <widget class="QLabel" name="lbl_facultyno">
               <property name="text">
                <string>Факультетный номер: </string>
               </property>
@@ -400,7 +400,7 @@ QLabel#label_8 {
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_3">
+             <widget class="QLabel" name="lbl_faculty">
               <property name="text">
                <string>Факультет: </string>
               </property>
@@ -410,7 +410,7 @@ QLabel#label_8 {
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_5">
+             <widget class="QLabel" name="lbl_speciality">
               <property name="text">
                <string>Специальность: </string>
               </property>
@@ -420,7 +420,7 @@ QLabel#label_8 {
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label">
+             <widget class="QLabel" name="lbl_typestyding">
               <property name="text">
                <string>Вид обучения:</string>
               </property>
@@ -430,7 +430,7 @@ QLabel#label_8 {
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_4">
+             <widget class="QLabel" name="lbl_group">
               <property name="text">
                <string>Группа:</string>
               </property>
@@ -440,7 +440,7 @@ QLabel#label_8 {
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_6">
+             <widget class="QLabel" name="lbl_stream">
               <property name="text">
                <string>Поток:</string>
               </property>

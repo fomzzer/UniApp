@@ -16,6 +16,9 @@ public:
     explicit DashboardWindow(QWidget *parent = nullptr);
     ~DashboardWindow();
 
+    void setUserName(const QString &name);
+    void setUserInfo(const QStringList &info);
+
 private:
     Ui::DashboardWindow *ui;
     QJsonArray m_schedules;

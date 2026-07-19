@@ -173,3 +173,16 @@ void DashboardWindow::startPythonScrapper() {
     QString scriptPath = QCoreApplication::applicationDirPath() + "/scraper.py";
     process->start("python", QStringList() << "-u" << scriptPath);
 }
+
+void DashboardWindow::setUserName(const QString &name) {
+    ui->lbl_name->setText(name);
+}
+
+void DashboardWindow::setUserInfo(const QStringList &info) {
+    ui->lbl_facultyno->setText(info[0]);
+    ui->lbl_faculty->setText(info[1]);
+    ui->lbl_speciality->setText(info[2]);
+    ui->lbl_typestyding->setText(info[3]);
+    ui->lbl_group->setText(info[4]);
+    ui->lbl_stream->setText(info[5]);
+}

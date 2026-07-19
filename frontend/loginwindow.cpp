@@ -4,6 +4,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMessageBox>
+#include <QStringList>
 
 LoginWindow::LoginWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -74,7 +75,16 @@ void LoginWindow::onServerResponse(QNetworkReply* reply) {
 
     if (replyJson.contains("status") && replyJson["status"].toString() == "success") {
         ui->pushButton->setText("Войти");
-        emit loginSuccessful();
+        QString userName = replyJson["name"].toString();
+        QJsonObject userInfoObject = replyJson["info"].toObject();
+        QString facultyNo = userInfoObject["Факултетен номер"].toString();
+        QString faculty = userInfoObject["Факултет"].toString();
+        QString speciality = userInfoObject["Специалност"].toString();
+        QString typeStydying = userInfoObject["Вид обучение"].toString();
+        QString group = userInfoObject["Група"].toString();
+        QString stream = userInfoObject["Поток"].toString();
+        QStringList userInfo = {facultyNo, faculty, speciality, typeStydying, group, stream};
+        emit loginSuccessful(userName, userInfo);
     }
     else {
         ui->pushButton->setText("Войти");

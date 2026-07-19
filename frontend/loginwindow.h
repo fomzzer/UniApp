@@ -21,7 +21,7 @@ public:
     ~LoginWindow() override;
 
 signals:
-    void loginSuccessful();
+    void loginSuccessful(const QString &userName, const QStringList &userInfo);
 
 private slots:
     void onLoginButtonClicked();
