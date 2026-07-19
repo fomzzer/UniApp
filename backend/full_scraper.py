@@ -39,7 +39,8 @@ def scrap_tu_sofia(credentials: LoginData):
                         key_element = cells[i]
                         val_element = cells[i+1]
 
-                        key = key_element.text.replace('\xa0', ' ').strip().rstrip(':').strip()
+                        key_strings = list(key_element.stripped_strings)
+                        key = key_strings[0].replace('\xa0', ' ').strip().rstrip(':').strip()
                         val_strings = list(val_element.stripped_strings)
                         val = val_strings[0].replace('"', '') if val_strings else ""
 
