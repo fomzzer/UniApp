@@ -179,10 +179,10 @@ void DashboardWindow::setUserName(const QString &name) {
 }
 
 void DashboardWindow::setUserInfo(const QStringList &info) {
-    ui->lbl_facultyno->setText(info[0]);
-    ui->lbl_faculty->setText(info[1]);
-    ui->lbl_speciality->setText(info[2]);
-    ui->lbl_typestyding->setText(info[3]);
-    ui->lbl_group->setText(info[4]);
-    ui->lbl_stream->setText(info[5]);
+    ui->lbl_facultyno->setText(ui->lbl_facultyno->text().append(" " + info[0]));
+    ui->lbl_faculty->setText(ui->lbl_faculty->text().append(" " + info[1]));
+    ui->lbl_speciality->setText(ui->lbl_speciality->text().append(" " + info[2]));
+    ui->lbl_typestyding->setText(ui->lbl_typestyding->text().append(" " + info[3]));
+    ui->lbl_group->setText(ui->lbl_group->text().append(" " + info[4]));
+    ui->lbl_stream->setText(ui->lbl_stream->text().append(" " + info[5]));
 }

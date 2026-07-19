@@ -77,7 +77,7 @@ void LoginWindow::onServerResponse(QNetworkReply* reply) {
         ui->pushButton->setText("Войти");
         QString userName = replyJson["name"].toString();
         QJsonObject userInfoObject = replyJson["info"].toObject();
-        QString facultyNo = userInfoObject["Факултетен номер"].toString();
+        QString facultyNo = userInfoObject["Фак. номер"].toString();
         QString faculty = userInfoObject["Факултет"].toString();
         QString speciality = userInfoObject["Специалност"].toString();
         QString typeStydying = userInfoObject["Вид обучение"].toString();
