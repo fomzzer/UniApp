@@ -3,13 +3,11 @@
 #include <QHeaderView>
 #include <QDesktopServices>
 #include <QUrl>
-#include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QSet>
-#include <QProcess>
-#include <QCoreApplication>
+#include <QMessageBox>
 
 DashboardWindow::DashboardWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -19,6 +17,9 @@ DashboardWindow::DashboardWindow(QWidget *parent)
 
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->stackedWidget->setCurrentIndex(0);
+
+    networkManager = new QNetworkAccessManager(this);
+    connect(networkManager, &QNetworkAccessManager::finished, this, &DashboardWindow::onSchedulesReply);
 
     connect(ui->btn_profile, &QPushButton::clicked, [=]() {
         ui->stackedWidget->setCurrentIndex(0);
@@ -40,19 +41,26 @@ DashboardWindow::DashboardWindow(QWidget *parent)
         ui->stackedWidget->setCurrentIndex(4);
     });
 
-    loadSchedulesJson();
+    fetchSchedules();
 
     updateFaculties();
     updateSpecialties();
-    updateCoursesAndStreams();
+    updateCourses();
+    updateStreams();
 
     connect(ui->combo_faculty, &QComboBox::currentTextChanged, [=]() {
         updateSpecialties();
-        updateCoursesAndStreams();
+        updateCourses();
+        updateStreams();
     });
 
     connect(ui->combo_specialty, &QComboBox::currentTextChanged, [=]() {
-        updateCoursesAndStreams();
+        updateCourses();
+        updateStreams();
+    });
+
+    connect(ui->combo_course, &QComboBox::currentTextChanged, [=]() {
+        updateStreams();
     });
 
     connect(ui->btn_open_schedule, &QPushButton::clicked, [=]() {
@@ -61,8 +69,8 @@ DashboardWindow::DashboardWindow(QWidget *parent)
         QString selCourse = ui->combo_course->currentText();
         QString selStream = ui->combo_stream->currentText();
 
-        for (int i = 0; i < m_schedules.size(); ++i) {
-            QJsonObject obj = m_schedules[i].toObject();
+        for (int i = 0; i < schedules.size(); ++i) {
+            QJsonObject obj = schedules[i].toObject();
             if (obj["faculty"].toString() == selFaculty &&
                 obj["specialty"].toString() == selSpecialty &&
                 obj["course"].toString() == selCourse &&
@@ -74,7 +82,7 @@ DashboardWindow::DashboardWindow(QWidget *parent)
         }
     });
 
-    connect(ui->btn_update_data, &QPushButton::clicked, this, &DashboardWindow::startPythonScrapper);
+    connect(ui->btn_update_data, &QPushButton::clicked, this, &DashboardWindow::fetchSchedules);
 }
 
 DashboardWindow::~DashboardWindow()
@@ -82,26 +90,49 @@ DashboardWindow::~DashboardWindow()
     delete ui;
 }
 
-void DashboardWindow::loadSchedulesJson() {
-    QFile file("schedules.json");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        file.setFileName("../backend/schedules.json");
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) return;
+void DashboardWindow::fetchSchedules() {
+    ui->btn_update_data->setEnabled(false);
+    ui->btn_update_data->setText("Загрузка данных...");
+
+    QUrl url("http://20.215.255.122:8000/api/schedules");
+    QNetworkRequest request(url);
+    networkManager->get(request);
+}
+
+void DashboardWindow::onSchedulesReply(QNetworkReply* reply) {
+    ui->btn_update_data->setEnabled(true);
+    ui->btn_update_data->setText("Обновить данные");
+
+    if (reply->error() != QNetworkReply::NoError) {
+        QMessageBox::critical(this, "Ошибка", "Не удалось обновить расписание с сервера: " + reply->errorString());
+        reply->deleteLater();
+        return;
     }
 
-    QByteArray data = file.readAll();
-    file.close();
+    QByteArray responseData = reply->readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(responseData);
 
-    QJsonDocument doc = QJsonDocument::fromJson(data);
-    m_schedules = doc.array();
+    if (doc.isArray()) {
+        schedules = doc.array();
+
+        updateFaculties();
+        updateSpecialties();
+        updateCourses();
+        updateStreams();
+    }
+    else {
+        QMessageBox::warning(this, "Предупреждение", "Сервер вернул некорректный формат данных.");
+    }
+
+    reply->deleteLater();
 }
 
 void DashboardWindow::updateFaculties() {
     ui->combo_faculty->clear();
     QSet<QString> uniqueFaculties;
 
-    for (int i = 0; i < m_schedules.size(); ++i) {
-        QJsonObject obj = m_schedules[i].toObject();
+    for (int i = 0; i < schedules.size(); ++i) {
+        QJsonObject obj = schedules[i].toObject();
         uniqueFaculties.insert(obj["faculty"].toString());
     }
 
@@ -115,8 +146,8 @@ void DashboardWindow::updateSpecialties() {
     QString currentFaculty = ui->combo_faculty->currentText();
     QSet<QString> uniqueSpecialties;
 
-    for (int i = 0; i < m_schedules.size(); ++i) {
-        QJsonObject obj = m_schedules[i].toObject();
+    for (int i = 0; i < schedules.size(); ++i) {
+        QJsonObject obj = schedules[i].toObject();
         if (obj["faculty"].toString() == currentFaculty) {
             uniqueSpecialties.insert(obj["specialty"].toString());
         }
@@ -127,51 +158,43 @@ void DashboardWindow::updateSpecialties() {
     ui->combo_specialty->setCurrentIndex(0);
 }
 
-void DashboardWindow::updateCoursesAndStreams() {
+void DashboardWindow::updateCourses() {
     ui->combo_course->clear();
-    ui->combo_stream->clear();
 
     QString currentFaculty = ui->combo_faculty->currentText();
-    QString currentSpecialty = ui->combo_specialty->currentText();
-
+    QString currentSpeciality = ui->combo_specialty->currentText();
     QSet<QString> uniqueCourses;
-    QSet<QString> uniqueStreams;
 
-    for (int i = 0; i < m_schedules.size(); ++i) {
-        QJsonObject obj = m_schedules[i].toObject();
-        if (obj["faculty"].toString() == currentFaculty && obj["specialty"].toString() == currentSpecialty) {
+    for (int i = 0; i < schedules.size(); ++i) {
+        QJsonObject obj = schedules[i].toObject();
+        if (obj["faculty"].toString() == currentFaculty && obj["speciality"].toString() == currentSpeciality) {
             uniqueCourses.insert(obj["course"].toString());
-            uniqueStreams.insert(obj["stream"].toString());
         }
     }
 
     ui->combo_course->addItem("Выберите курс");
-    ui->combo_stream->addItem("Выберите поток");
     ui->combo_course->addItems(uniqueCourses.values());
-    ui->combo_stream->addItems(uniqueStreams.values());
     ui->combo_course->setCurrentIndex(0);
-    ui->combo_stream->setCurrentIndex(0);
 }
 
-void DashboardWindow::startPythonScrapper() {
-    ui->btn_update_data->setEnabled(false);
-    ui->btn_update_data->setText("Скачивание данных...");
+void DashboardWindow::updateStreams() {
+    ui->combo_stream->clear();
 
-    QProcess *process = new QProcess(this);
+    QString currentFaculty = ui->combo_faculty->currentText();
+    QString currentSpeciality = ui->combo_specialty->currentText();
+    QString currentCourse = ui->combo_course->currentText();
+    QSet<QString> uniqueStreams;
 
-    connect(process, &QProcess::finished, this, [this, process](int exitCode) {
-        ui->btn_update_data->setEnabled(true);
-        ui->btn_update_data->setText("Обновить данные");
-
-        if (exitCode == 0) {
-            loadSchedulesJson();
+    for (int i = 0; i < schedules.size(); ++i) {
+        QJsonObject obj = schedules[i].toObject();
+        if (obj["faculty"].toString() == currentFaculty && obj["speciality"].toString() == currentSpeciality && obj["course"].toString() == currentCourse) {
+            uniqueStreams.insert(obj["stream"].toString());
         }
+    }
 
-        process->deleteLater();
-    });
-
-    QString scriptPath = QCoreApplication::applicationDirPath() + "/scraper.py";
-    process->start("python", QStringList() << "-u" << scriptPath);
+    ui->combo_stream->addItem("Выберите поток");
+    ui->combo_stream->addItems(uniqueStreams.values());
+    ui->combo_stream->setCurrentIndex(0);
 }
 
 void DashboardWindow::setUserName(const QString &name) {

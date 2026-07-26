@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <QJsonArray>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 
 namespace Ui {
 class DashboardWindow;
@@ -21,16 +24,17 @@ public:
 
 private:
     Ui::DashboardWindow *ui;
-    QJsonArray m_schedules;
+    QJsonArray schedules;
+    QNetworkAccessManager *networkManager;
 
-    void loadSchedulesJson();
-    void updateDegrees();
     void updateFaculties();
     void updateSpecialties();
-    void updateCoursesAndStreams();
+    void updateCourses();
+    void updateStreams();
+    void fetchSchedules();
 
 private slots:
-    void startPythonScrapper();
+    void onSchedulesReply(QNetworkReply* reply);
 };
 
 #endif // DASHBOARDWINDOW_H
