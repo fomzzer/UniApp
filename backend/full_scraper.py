@@ -104,7 +104,7 @@ def get_schedule():
                         cols = row.find_all('td')
                         if len(cols) >= 7:
                             faculty = cols[2].text.strip()
-                            specialty = cols[3].text.strip()
+                            speciality = cols[3].text.strip()
                             course = cols[4].text.strip()
                             stream = cols[5].text.strip()
 
@@ -116,7 +116,7 @@ def get_schedule():
 
                                 all_schedules.append({
                                     "faculty": faculty,
-                                    "speciality": specialty,
+                                    "speciality": speciality,
                                     "course": course,
                                     "stream": stream,
                                     "url": pdf_url

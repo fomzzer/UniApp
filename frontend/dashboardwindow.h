@@ -26,12 +26,15 @@ private:
     Ui::DashboardWindow *ui;
     QJsonArray schedules;
     QNetworkAccessManager *networkManager;
+    QStringList scheduleInfo;
 
     void updateFaculties();
     void updateSpecialties();
     void updateCourses();
     void updateStreams();
     void fetchSchedules();
+    void setDefaultSchedule(const QStringList &scheduleInfo);
+    QString getAcronym(const QString fullWord);
 
 private slots:
     void onSchedulesReply(QNetworkReply* reply);

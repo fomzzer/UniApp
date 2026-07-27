@@ -9,6 +9,8 @@
 #include <QSet>
 #include <QMessageBox>
 
+#include <QDebug>
+
 DashboardWindow::DashboardWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::DashboardWindow)
@@ -54,7 +56,7 @@ DashboardWindow::DashboardWindow(QWidget *parent)
         updateStreams();
     });
 
-    connect(ui->combo_specialty, &QComboBox::currentTextChanged, [=]() {
+    connect(ui->combo_speciality, &QComboBox::currentTextChanged, [=]() {
         updateCourses();
         updateStreams();
     });
@@ -65,14 +67,14 @@ DashboardWindow::DashboardWindow(QWidget *parent)
 
     connect(ui->btn_open_schedule, &QPushButton::clicked, [=]() {
         QString selFaculty = ui->combo_faculty->currentText();
-        QString selSpecialty = ui->combo_specialty->currentText();
+        QString selSpecialty = ui->combo_speciality->currentText();
         QString selCourse = ui->combo_course->currentText();
         QString selStream = ui->combo_stream->currentText();
 
         for (int i = 0; i < schedules.size(); ++i) {
             QJsonObject obj = schedules[i].toObject();
             if (obj["faculty"].toString() == selFaculty &&
-                obj["specialty"].toString() == selSpecialty &&
+                obj["speciality"].toString() == selSpecialty &&
                 obj["course"].toString() == selCourse &&
                 obj["stream"].toString() == selStream)
             {
@@ -119,6 +121,10 @@ void DashboardWindow::onSchedulesReply(QNetworkReply* reply) {
         updateSpecialties();
         updateCourses();
         updateStreams();
+
+        if (!scheduleInfo.isEmpty()) {
+            setDefaultSchedule(scheduleInfo);
+        }
     }
     else {
         QMessageBox::warning(this, "Предупреждение", "Сервер вернул некорректный формат данных.");
@@ -142,27 +148,27 @@ void DashboardWindow::updateFaculties() {
 }
 
 void DashboardWindow::updateSpecialties() {
-    ui->combo_specialty->clear();
+    ui->combo_speciality->clear();
     QString currentFaculty = ui->combo_faculty->currentText();
     QSet<QString> uniqueSpecialties;
 
     for (int i = 0; i < schedules.size(); ++i) {
         QJsonObject obj = schedules[i].toObject();
         if (obj["faculty"].toString() == currentFaculty) {
-            uniqueSpecialties.insert(obj["specialty"].toString());
+            uniqueSpecialties.insert(obj["speciality"].toString());
         }
     }
 
-    ui->combo_specialty->addItem("Выберите специальность");
-    ui->combo_specialty->addItems(uniqueSpecialties.values());
-    ui->combo_specialty->setCurrentIndex(0);
+    ui->combo_speciality->addItem("Выберите специальность");
+    ui->combo_speciality->addItems(uniqueSpecialties.values());
+    ui->combo_speciality->setCurrentIndex(0);
 }
 
 void DashboardWindow::updateCourses() {
     ui->combo_course->clear();
 
     QString currentFaculty = ui->combo_faculty->currentText();
-    QString currentSpeciality = ui->combo_specialty->currentText();
+    QString currentSpeciality = ui->combo_speciality->currentText();
     QSet<QString> uniqueCourses;
 
     for (int i = 0; i < schedules.size(); ++i) {
@@ -181,13 +187,16 @@ void DashboardWindow::updateStreams() {
     ui->combo_stream->clear();
 
     QString currentFaculty = ui->combo_faculty->currentText();
-    QString currentSpeciality = ui->combo_specialty->currentText();
+    QString currentSpeciality = ui->combo_speciality->currentText();
     QString currentCourse = ui->combo_course->currentText();
     QSet<QString> uniqueStreams;
 
     for (int i = 0; i < schedules.size(); ++i) {
         QJsonObject obj = schedules[i].toObject();
-        if (obj["faculty"].toString() == currentFaculty && obj["speciality"].toString() == currentSpeciality && obj["course"].toString() == currentCourse) {
+        if (obj["faculty"].toString() == currentFaculty &&
+            obj["speciality"].toString() == currentSpeciality &&
+            obj["course"].toString() == currentCourse) {
+
             uniqueStreams.insert(obj["stream"].toString());
         }
     }
@@ -195,6 +204,43 @@ void DashboardWindow::updateStreams() {
     ui->combo_stream->addItem("Выберите поток");
     ui->combo_stream->addItems(uniqueStreams.values());
     ui->combo_stream->setCurrentIndex(0);
+}
+
+void DashboardWindow::setDefaultSchedule(const QStringList &scheduleInfo) {
+    if (scheduleInfo.size() < 4) return;
+
+    ui->combo_faculty->blockSignals(true);
+    ui->combo_speciality->blockSignals(true);
+    ui->combo_course->blockSignals(true);
+    ui->combo_stream->blockSignals(true);
+
+    int facultyIndex = ui->combo_faculty->findText(scheduleInfo[0]);
+    if (facultyIndex != -1) {
+        ui->combo_faculty->setCurrentIndex(facultyIndex);
+    }
+
+    updateSpecialties();
+    int specialityIndex = ui->combo_speciality->findText(scheduleInfo[1]);
+    if (specialityIndex != -1) {
+        ui->combo_speciality->setCurrentIndex(specialityIndex);
+    }
+
+    updateCourses();
+    int courseIndex = ui->combo_course->findText(scheduleInfo[2]);
+    if (courseIndex != -1) {
+        ui->combo_course->setCurrentIndex(courseIndex);
+    }
+
+    updateStreams();
+    int streamIndex = ui->combo_stream->findText(scheduleInfo[3]);
+    if (streamIndex != -1) {
+        ui->combo_stream->setCurrentIndex(streamIndex);
+    }
+
+    ui->combo_faculty->blockSignals(false);
+    ui->combo_speciality->blockSignals(false);
+    ui->combo_course->blockSignals(false);
+    ui->combo_stream->blockSignals(false);
 }
 
 void DashboardWindow::setUserName(const QString &name) {
@@ -208,4 +254,31 @@ void DashboardWindow::setUserInfo(const QStringList &info) {
     ui->lbl_typestyding->setText(ui->lbl_typestyding->text().append(" " + info[3]));
     ui->lbl_group->setText(ui->lbl_group->text().append(" " + info[4]));
     ui->lbl_stream->setText(ui->lbl_stream->text().append(" " + info[5]));
+
+    scheduleInfo.clear();
+    scheduleInfo.append(getAcronym(info[1]));
+    scheduleInfo.append(getAcronym(info[2]));
+    scheduleInfo.append(info[4]);
+    scheduleInfo.append(info[5]);
+
+    if (!schedules.isEmpty()) {
+        setDefaultSchedule(scheduleInfo);
+    }
+}
+
+QString DashboardWindow::getAcronym(const QString fullWord) {
+    QStringList words = fullWord.split(' ', Qt::SkipEmptyParts);
+    QString acronym = "";
+
+    for (const QString &word : words) {
+        if (word.toLower() == "и" || word.toLower() == "в" || word.toLower() == "с" || word.toLower() == "по") {
+            continue;
+        }
+
+        if (!word.isEmpty()) {
+            acronym += word.at(0).toUpper();
+        }
+    }
+
+    return acronym;
 }

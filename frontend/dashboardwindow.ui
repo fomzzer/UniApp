@@ -527,7 +527,7 @@ QLabel#label_8 {
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="combo_specialty">
+             <widget class="QComboBox" name="combo_speciality">
               <property name="font">
                <font>
                 <family>Segoe UI</family>
@@ -685,7 +685,7 @@ QLabel#label_8 {
     &lt;span style=&quot;color: #8B949E;&quot;&gt;Дата сборки:&lt;/span&gt; 12 июля 2026 г.&lt;br&gt;
     &lt;span style=&quot;color: #8B949E;&quot;&gt;Стек:&lt;/span&gt; C++ / Qt 6.11, Python 3.14.6&lt;br&gt;
     &lt;br&gt;
-    &lt;span style=&quot;color: #8B949E;&quot;&gt;Разработчики:&lt;/span&gt; fomzzer, sa1roze&lt;br&gt;
+    &lt;span style=&quot;color: #8B949E;&quot;&gt;Разработчик:&lt;/span&gt; fomzzer&lt;br&gt;
     &lt;br&gt;
     &lt;span style=&quot;color: #58A6FF;&quot;&gt;GitHub:&lt;/span&gt; github.com/fomzzer/uniapp&lt;br&gt;
     &lt;span style=&quot;color: #58A6FF;&quot;&gt;Email:&lt;/span&gt; fomzzer@gmail.com
