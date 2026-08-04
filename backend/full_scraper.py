@@ -4,11 +4,13 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import logging
+import ddddocr
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+ocr = ddddocr.DdddOcr(show_ad=False)
 
 class LoginData(BaseModel):
     faculty_no: str
@@ -19,60 +21,80 @@ def get_info(credentials: LoginData):
     url = "https://e-university.tu-sofia.bg/ETUS/studenti/"
     headers = {"User-Agent": "Mozilla/5.0"}
 
-    data = {
-        'fnum': credentials.faculty_no,
-        'd_f_i': credentials.auth_code
-    }
-
     session = requests.Session()
-    post_response = session.post(url, headers=headers, data=data)
 
-    if "Изход" in post_response.text:
-        soup = BeautifulSoup(post_response.text, 'lxml')
-        logout_btn = soup.find('input', id = 'izh')
+    try:
+        session.get(url, headers=headers, timeout=10)
+        
+        captcha_url = "https://e-university.tu-sofia.bg/ETUS/studenti/captcha.php"
+        captcha_response = session.get(captcha_url, headers=headers, timeout=10)
+        
+        captcha_text = ""
+        if captcha_response.status_code == 200:
+            raw_captcha = ocr.classification(captcha_response.content)
+            captcha_text = raw_captcha.strip().upper()
+            logger.info(f"AI CAPTCHA detected: {captcha_text}")
 
-        if logout_btn:
-            full_name = logout_btn.parent.text.strip()
-            all_info = {}
-            info_table = soup.find('table', id='info')
+        data = {
+            'fnum': credentials.faculty_no,
+            'd_f_i': credentials.auth_code,
+            'captcha': captcha_text
+        }
 
-            if info_table:
-                for row in info_table.find_all('tr'):
-                    cells = row.find_all('td')
+        post_response = session.post(url, headers=headers, data=data, timeout=10)
 
-                    for i in range(0, len(cells) - 1, 2):
-                        key_element = cells[i]
-                        val_element = cells[i+1]
+        if "Изход" in post_response.text:
+            soup = BeautifulSoup(post_response.text, 'lxml')
+            logout_btn = soup.find('input', id='izh')
 
-                        key_strings = list(key_element.stripped_strings)
-                        key = key_strings[0].replace('\xa0', ' ').strip().rstrip(':').strip()
-                        val_strings = list(val_element.stripped_strings)
-                        val = val_strings[0].replace('"', '') if val_strings else ""
+            if logout_btn:
+                full_name = logout_btn.parent.text.strip()
+                all_info = {}
+                info_table = soup.find('table', id='info')
 
-                        if key:
-                            all_info[key] = val
+                if info_table:
+                    for row in info_table.find_all('tr'):
+                        cells = row.find_all('td')
 
-            return {
-                'status': 'success',
-                'name': full_name,
-                'info': all_info
-            }
+                        for i in range(0, len(cells) - 1, 2):
+                            key_element = cells[i]
+                            val_element = cells[i+1]
+
+                            key_strings = list(key_element.stripped_strings)
+                            if key_strings:
+                                key = key_strings[0].replace('\xa0', ' ').replace('"', '').strip().rstrip(':').strip()
+                            else:
+                                key = ""
+
+                            val_strings = list(val_element.stripped_strings)
+                            val = val_strings[0].replace('"', '') if val_strings else ""
+
+                            if key:
+                                all_info[key] = val
+
+                return {
+                    'status': 'success',
+                    'name': full_name,
+                    'info': all_info
+                }
+            else:
+                return {'status': 'error', 'message': "Failed to parse information"}
         else:
-            return {'status': 'error', 'message': "Failed to parse information"}
-    else:
-        return {'status': 'error', 'message': "Invalid credentials"}
+            return {'status': 'error', 'message': "Invalid credentials or CAPTCHA"}
+    except Exception as e:
+        logger.error(f"Request error: {e}")
+        return {'status': 'error', 'message': f"Server connection error: {str(e)}"}
 
 
 @app.get("/api/schedules")
 def get_schedule():
     try:
         url = "https://tu-sofia.bg/university/weeklyprograms"
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+        headers = {"User-Agent": "Mozilla/5.0"}
 
         all_schedules = []
 
         for faculty_id in range(1, 35):
-
             form_data = {
                 "Faculty[id]": str(faculty_id)
             }
@@ -83,18 +105,13 @@ def get_schedule():
                     continue
 
                 soup = BeautifulSoup(response.text, 'html.parser')
-
                 all_tables = soup.find_all('table')
-
                 valid_tables = [t for t in all_tables if "Специалност" in t.text and "Поток" in t.text]
 
                 if not valid_tables:
                     continue
 
-                count = 0
-
                 for i, table in enumerate(valid_tables):
-
                     if "Няма намерени резултати" in table.text:
                         continue
 
@@ -121,7 +138,6 @@ def get_schedule():
                                     "stream": stream,
                                     "url": pdf_url
                                 })
-                                count += 1
 
                 time.sleep(0.5)
 

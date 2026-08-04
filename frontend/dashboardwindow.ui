@@ -374,7 +374,7 @@ QLabel#label_8 {
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>10</width>
+              <width>3</width>
               <height>20</height>
              </size>
             </property>
@@ -446,6 +446,20 @@ QLabel#label_8 {
               </property>
               <property name="textFormat">
                <enum>Qt::TextFormat::PlainText</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lbl_semester">
+              <property name="text">
+               <string>Семестр: </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lbl_course">
+              <property name="text">
+               <string>Курс:</string>
               </property>
              </widget>
             </item>

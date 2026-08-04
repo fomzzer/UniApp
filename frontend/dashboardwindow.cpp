@@ -254,11 +254,13 @@ void DashboardWindow::setUserInfo(const QStringList &info) {
     ui->lbl_typestyding->setText(ui->lbl_typestyding->text().append(" " + info[3]));
     ui->lbl_group->setText(ui->lbl_group->text().append(" " + info[4]));
     ui->lbl_stream->setText(ui->lbl_stream->text().append(" " + info[5]));
+    ui->lbl_semester->setText(ui->lbl_semester->text().append(" " + info[6]));
+    ui->lbl_course->setText(ui->lbl_course->text().append(" " + info[7]));
 
     scheduleInfo.clear();
     scheduleInfo.append(getAcronym(info[1]));
     scheduleInfo.append(getAcronym(info[2]));
-    scheduleInfo.append(info[4]);
+    scheduleInfo.append(info[8]);
     scheduleInfo.append(info[5]);
 
     if (!schedules.isEmpty()) {

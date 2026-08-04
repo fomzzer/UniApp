@@ -83,7 +83,10 @@ void LoginWindow::onServerResponse(QNetworkReply* reply) {
         QString typeStydying = userInfoObject["Вид обучение"].toString();
         QString group = userInfoObject["Група"].toString();
         QString stream = userInfoObject["Поток"].toString();
-        QStringList userInfo = {facultyNo, faculty, speciality, typeStydying, group, stream};
+        QString semester = userInfoObject["Записан семестър"].toString();
+        QString course = QString::number((semester.toInt() + 1) / 2);
+        QString currentFactCourse = QString::number((semester.toInt() - 1) / 2);
+        QStringList userInfo = {facultyNo, faculty, speciality, typeStydying, group, stream, semester, course, currentFactCourse};
         emit loginSuccessful(userName, userInfo);
     }
     else {
