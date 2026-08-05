@@ -79,7 +79,7 @@ def get_info(credentials: LoginData):
                                 key = key_strings[0].replace('\xa0', ' ').replace('"', '').strip().rstrip(':').strip() if key_strings else ""
 
                                 val_strings = list(val_element.stripped_strings)
-                                val = val_strings[0].replace('"', '') if val_strings else ""
+                                val = val_strings[0].replace('"', '').strip() if val_strings else ""
 
                                 if key:
                                     all_info[key] = val
