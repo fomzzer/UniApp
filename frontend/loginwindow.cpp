@@ -7,6 +7,7 @@
 #include <QStringList>
 #include <QRegularExpressionValidator>
 #include <QKeyEvent>
+#include <QSettings>
 
 LoginWindow::LoginWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -14,14 +15,28 @@ LoginWindow::LoginWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    QSettings settings;
+
+    if (settings.contains("login") && settings.contains("password")) {
+        ui->lineEdit->setText(settings.value("login").toString());
+
+        QByteArray savedPassword = settings.value("password").toByteArray();
+        ui->lineEdit_2->setText(QString::fromUtf8(QByteArray::fromBase64(savedPassword)));
+
+        ui->checkBox_remember->setChecked(true);
+    }
+
     ui->label->setFocus();
 
     networkManager = new QNetworkAccessManager(this);
     connect(networkManager, &QNetworkAccessManager::finished, this, &LoginWindow::onServerResponse);
+
     ui->lineEdit->setValidator(new QRegularExpressionValidator(QRegularExpression("^\\d*$"), this));
     ui->lineEdit_2->setValidator(new QRegularExpressionValidator(QRegularExpression("^\\d*$"), this));
+
     connect(ui->lineEdit, &QLineEdit::returnPressed, this, &LoginWindow::onLoginButtonClicked);
     connect(ui->lineEdit_2, &QLineEdit::returnPressed, this, &LoginWindow::onLoginButtonClicked);
+
     ui->lineEdit->installEventFilter(this);
     ui->lineEdit_2->installEventFilter(this);
 }
@@ -100,6 +115,20 @@ void LoginWindow::onServerResponse(QNetworkReply* reply) {
         QString course = QString::number((semester.toInt() + 1) / 2);
         QString currentFactCourse = QString::number((semester.toInt() - 1) / 2);
         QStringList userInfo = {facultyNo, faculty, speciality, typeStydying, group, stream, semester, course, currentFactCourse};
+
+        QSettings settings;
+
+        if (ui->checkBox_remember->isChecked()) {
+            settings.setValue("login", ui->lineEdit->text().trimmed());
+
+            QByteArray passwordBytes = ui->lineEdit_2->text().trimmed().toUtf8();
+            settings.setValue("password", passwordBytes.toBase64());
+        }
+        else {
+            settings.remove("login");
+            settings.remove("password");
+        }
+
         emit loginSuccessful(userName, userInfo);
     }
     else {
@@ -114,6 +143,7 @@ void LoginWindow::onServerResponse(QNetworkReply* reply) {
 void LoginWindow::clearLoginWindow() {
     ui->lineEdit->clear();
     ui->lineEdit_2->clear();
+    ui->checkBox_remember->setChecked(false);
 }
 
 bool LoginWindow::eventFilter(QObject *watched, QEvent *event)

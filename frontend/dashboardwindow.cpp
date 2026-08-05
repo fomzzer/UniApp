@@ -8,6 +8,7 @@
 #include <QJsonArray>
 #include <QSet>
 #include <QMessageBox>
+#include <QSettings>
 
 DashboardWindow::DashboardWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -42,7 +43,10 @@ DashboardWindow::DashboardWindow(QWidget *parent)
     });
 
     connect(ui->btn_logout, &QPushButton::clicked, this, [=]() {
-        ui->lbl_name->clear();
+        QSettings settings;
+        settings.remove("login");
+        settings.remove("password");
+
         emit logoutRequested();
     });
 

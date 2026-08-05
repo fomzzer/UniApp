@@ -6,6 +6,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    QCoreApplication::setOrganizationName("fomzzer");
+    QCoreApplication::setApplicationName("UniApp");
+
     LoginWindow *logWin = new LoginWindow();
     DashboardWindow *dashWin = new DashboardWindow();
 
