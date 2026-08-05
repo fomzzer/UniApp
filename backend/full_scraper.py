@@ -37,6 +37,7 @@ def get_info(credentials: LoginData):
 
         data = {
             'fnum': credentials.faculty_no,
+            'egn': credentials.auth_code,
             'd_f_i': credentials.auth_code,
             'captcha': captcha_text
         }
