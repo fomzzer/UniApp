@@ -22,15 +22,14 @@ def get_info(credentials: LoginData):
     headers = {"User-Agent": "Mozilla/5.0"}
 
     is_2fa = len(credentials.auth_code) == 6 and credentials.auth_code.isdigit()
-    
     max_attempts = 1 if is_2fa else 3 
 
     session = requests.Session()
 
     try:
-        session.get(url, headers=headers, timeout=10)
-
         for attempt in range(max_attempts):
+            session.get(url, headers=headers, timeout=10)
+
             captcha_text = ""
             
             if not is_2fa:
@@ -41,14 +40,14 @@ def get_info(credentials: LoginData):
                     raw_captcha = ocr.classification(captcha_response.content)
                     captcha_text = raw_captcha.strip().upper()
                     
-                    captcha_text = captcha_text.replace('0', 'O').replace('1', 'I').replace('9', 'G')
-                    
-                    logger.info(f"Attempt {attempt + 1}: AI CAPTCHA detected: {captcha_text}")
+                    replacements = {'0':'O', '1':'I', '2':'Z', '3':'E', '4':'A', '5':'S', '6':'G', '7':'T', '8':'B', '9':'G'}
+                    for digit, letter in replacements.items():
+                        captcha_text = captcha_text.replace(digit, letter)
+                        
+                    logger.info(f"Attempt {attempt + 1}: AI CAPTCHA processed: {captcha_text}")
 
             data = {
                 'fnum': credentials.faculty_no,
-                'egn': '',
-                'd_f_i': '',
                 'captcha': captcha_text
             }
 
@@ -96,10 +95,10 @@ def get_info(credentials: LoginData):
             if is_2fa:
                 break
             
-            logger.warning("Login failed, possibly wrong CAPTCHA. Retrying...")
+            logger.warning("Login failed, retrying with new CAPTCHA...")
             time.sleep(0.5)
 
-        return {'status': 'error', 'message': "Invalid credentials or CAPTCHA (after 3 attempts)"}
+        return {'status': 'error', 'message': "Invalid credentials or CAPTCHA"}
 
     except Exception as e:
         logger.error(f"Request error: {e}")
