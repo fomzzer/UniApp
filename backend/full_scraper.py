@@ -36,12 +36,15 @@ def get_info(credentials: LoginData):
             logger.info(f"AI CAPTCHA detected: {captcha_text}")
 
         data = {
-            'fnum': credentials.faculty_no,
-            'egn': credentials.auth_code,
-            'd_f_i': credentials.auth_code,
+            'fnum': credentials.faculty_no, 
             'captcha': captcha_text
         }
 
+        if len(credentials.auth_code) == 6 and credentials.auth_code.isdigit():
+            data['d_f_i'] = credentials.auth_code
+        else:
+            data['egn'] = credentials.auth_code
+        
         post_response = session.post(url, headers=headers, data=data, timeout=10)
 
         if "Изход" in post_response.text:
