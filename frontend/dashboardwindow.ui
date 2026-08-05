@@ -452,7 +452,7 @@ QLabel#label_8 {
             <item>
              <widget class="QLabel" name="lbl_semester">
               <property name="text">
-               <string>Семестр: </string>
+               <string>Семестр:</string>
               </property>
              </widget>
             </item>
