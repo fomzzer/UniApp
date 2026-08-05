@@ -21,70 +21,86 @@ def get_info(credentials: LoginData):
     url = "https://e-university.tu-sofia.bg/ETUS/studenti/"
     headers = {"User-Agent": "Mozilla/5.0"}
 
+    is_2fa = len(credentials.auth_code) == 6 and credentials.auth_code.isdigit()
+    
+    max_attempts = 1 if is_2fa else 3 
+
     session = requests.Session()
 
     try:
         session.get(url, headers=headers, timeout=10)
-        
-        captcha_url = "https://e-university.tu-sofia.bg/ETUS/studenti/captcha.php"
-        captcha_response = session.get(captcha_url, headers=headers, timeout=10)
-        
-        captcha_text = ""
-        if captcha_response.status_code == 200:
-            raw_captcha = ocr.classification(captcha_response.content)
-            captcha_text = raw_captcha.strip().upper()
-            logger.info(f"AI CAPTCHA detected: {captcha_text}")
 
-        data = {
-            'fnum': credentials.faculty_no, 
-            'captcha': captcha_text
-        }
+        for attempt in range(max_attempts):
+            captcha_text = ""
+            
+            if not is_2fa:
+                captcha_url = "https://e-university.tu-sofia.bg/ETUS/studenti/captcha.php"
+                captcha_response = session.get(captcha_url, headers=headers, timeout=10)
+                
+                if captcha_response.status_code == 200:
+                    raw_captcha = ocr.classification(captcha_response.content)
+                    captcha_text = raw_captcha.strip().upper()
+                    
+                    captcha_text = captcha_text.replace('0', 'O').replace('1', 'I').replace('9', 'G')
+                    
+                    logger.info(f"Attempt {attempt + 1}: AI CAPTCHA detected: {captcha_text}")
 
-        if len(credentials.auth_code) == 6 and credentials.auth_code.isdigit():
-            data['d_f_i'] = credentials.auth_code
-        else:
-            data['egn'] = credentials.auth_code
-        
-        post_response = session.post(url, headers=headers, data=data, timeout=10)
+            data = {
+                'fnum': credentials.faculty_no,
+                'egn': '',
+                'd_f_i': '',
+                'captcha': captcha_text
+            }
 
-        if "Изход" in post_response.text:
-            soup = BeautifulSoup(post_response.text, 'lxml')
-            logout_btn = soup.find('input', id='izh')
-
-            if logout_btn:
-                full_name = logout_btn.parent.text.strip()
-                all_info = {}
-                info_table = soup.find('table', id='info')
-
-                if info_table:
-                    for row in info_table.find_all('tr'):
-                        cells = row.find_all('td')
-
-                        for i in range(0, len(cells) - 1, 2):
-                            key_element = cells[i]
-                            val_element = cells[i+1]
-
-                            key_strings = list(key_element.stripped_strings)
-                            if key_strings:
-                                key = key_strings[0].replace('\xa0', ' ').replace('"', '').strip().rstrip(':').strip()
-                            else:
-                                key = ""
-
-                            val_strings = list(val_element.stripped_strings)
-                            val = val_strings[0].replace('"', '') if val_strings else ""
-
-                            if key:
-                                all_info[key] = val
-
-                return {
-                    'status': 'success',
-                    'name': full_name,
-                    'info': all_info
-                }
+            if is_2fa:
+                data['d_f_i'] = credentials.auth_code
             else:
-                return {'status': 'error', 'message': "Failed to parse information"}
-        else:
-            return {'status': 'error', 'message': "Invalid credentials or CAPTCHA"}
+                data['egn'] = credentials.auth_code
+
+            post_response = session.post(url, headers=headers, data=data, timeout=10)
+
+            if "Изход" in post_response.text:
+                soup = BeautifulSoup(post_response.text, 'lxml')
+                logout_btn = soup.find('input', id='izh')
+
+                if logout_btn:
+                    full_name = logout_btn.parent.text.strip()
+                    all_info = {}
+                    info_table = soup.find('table', id='info')
+
+                    if info_table:
+                        for row in info_table.find_all('tr'):
+                            cells = row.find_all('td')
+
+                            for i in range(0, len(cells) - 1, 2):
+                                key_element = cells[i]
+                                val_element = cells[i+1]
+
+                                key_strings = list(key_element.stripped_strings)
+                                key = key_strings[0].replace('\xa0', ' ').replace('"', '').strip().rstrip(':').strip() if key_strings else ""
+
+                                val_strings = list(val_element.stripped_strings)
+                                val = val_strings[0].replace('"', '') if val_strings else ""
+
+                                if key:
+                                    all_info[key] = val
+
+                    return {
+                        'status': 'success',
+                        'name': full_name,
+                        'info': all_info
+                    }
+                else:
+                    return {'status': 'error', 'message': "Failed to parse information"}
+            
+            if is_2fa:
+                break
+            
+            logger.warning("Login failed, possibly wrong CAPTCHA. Retrying...")
+            time.sleep(0.5)
+
+        return {'status': 'error', 'message': "Invalid credentials or CAPTCHA (after 3 attempts)"}
+
     except Exception as e:
         logger.error(f"Request error: {e}")
         return {'status': 'error', 'message': f"Server connection error: {str(e)}"}
