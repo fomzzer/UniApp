@@ -21,6 +21,10 @@ public:
 
     void setUserName(const QString &name);
     void setUserInfo(const QStringList &info);
+    void clearDashboardWindow();
+
+signals:
+    void logoutRequested();
 
 private:
     Ui::DashboardWindow *ui;

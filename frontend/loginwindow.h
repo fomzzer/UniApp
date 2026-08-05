@@ -20,6 +20,8 @@ public:
     explicit LoginWindow(QWidget *parent = nullptr);
     ~LoginWindow() override;
 
+    void clearLoginWindow();
+
 signals:
     void loginSuccessful(const QString &userName, const QStringList &userInfo);
 
@@ -30,5 +32,8 @@ private slots:
 private:
     Ui::LoginWindow *ui;
     QNetworkAccessManager *networkManager;
+
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
 };
 #endif // LOGINWINDOW_H

@@ -5,6 +5,8 @@
 #include <QJsonObject>
 #include <QMessageBox>
 #include <QStringList>
+#include <QRegularExpressionValidator>
+#include <QKeyEvent>
 
 LoginWindow::LoginWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -16,6 +18,12 @@ LoginWindow::LoginWindow(QWidget *parent)
 
     networkManager = new QNetworkAccessManager(this);
     connect(networkManager, &QNetworkAccessManager::finished, this, &LoginWindow::onServerResponse);
+    ui->lineEdit->setValidator(new QRegularExpressionValidator(QRegularExpression("^\\d*$"), this));
+    ui->lineEdit_2->setValidator(new QRegularExpressionValidator(QRegularExpression("^\\d*$"), this));
+    connect(ui->lineEdit, &QLineEdit::returnPressed, this, &LoginWindow::onLoginButtonClicked);
+    connect(ui->lineEdit_2, &QLineEdit::returnPressed, this, &LoginWindow::onLoginButtonClicked);
+    ui->lineEdit->installEventFilter(this);
+    ui->lineEdit_2->installEventFilter(this);
 }
 
 LoginWindow::~LoginWindow()
@@ -25,20 +33,25 @@ LoginWindow::~LoginWindow()
 
 void LoginWindow::onLoginButtonClicked() {
 
-    if (ui->lineEdit->text().isEmpty() && ui->lineEdit_2->text().isEmpty()) {
+    QString login = ui->lineEdit->text().trimmed();
+    QString password = ui->lineEdit_2->text().trimmed();
+
+    if (login.isEmpty() && password.isEmpty()) {
         ui->pushButton->setText("Поля не заполнены");
         return;
     }
 
-    if (ui->lineEdit->text().isEmpty()) {
+    if (login.isEmpty()) {
         ui->pushButton->setText("Поле с факультетным номером не заполнено");
         return;
     }
 
-    if (ui->lineEdit_2->text().isEmpty()) {
-        ui->pushButton->setText("Поле с паролем не заполнено");
+    if (password.isEmpty()) {
+        ui->pushButton->setText("Поле с 2FA/ЕГН/ЛНЧ не заполнено");
         return;
     }
+
+    ui->pushButton->setText("Войти");
 
     QUrl url("http://20.215.255.122:8000/api/login");
     QNetworkRequest request(url);
@@ -91,9 +104,36 @@ void LoginWindow::onServerResponse(QNetworkReply* reply) {
     }
     else {
         ui->pushButton->setText("Войти");
-        QMessageBox::critical(this, "Ошибка", "Ошибка получения данных. Возможно, введен неверный факультетный номер или пароль");
+        QMessageBox::critical(this, "Ошибка", "Ошибка получения данных. Возможно, введен неверный факультетный номер или пароль. Так же, возможно ИИ неверно распознал каптчу. Попробуйте снова");
         return;
     }
 
     reply->deleteLater();
+}
+
+void LoginWindow::clearLoginWindow() {
+    ui->lineEdit->clear();
+    ui->lineEdit_2->clear();
+}
+
+bool LoginWindow::eventFilter(QObject *watched, QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+
+        if (keyEvent->key() == Qt::Key_Down) {
+            if (watched == ui->lineEdit) {
+                ui->lineEdit_2->setFocus();
+                return true;
+            }
+        }
+        else if (keyEvent->key() == Qt::Key_Up) {
+            if (watched == ui->lineEdit_2) {
+                ui->lineEdit->setFocus();
+                return true;
+            }
+        }
+    }
+
+    return QMainWindow::eventFilter(watched, event);
 }

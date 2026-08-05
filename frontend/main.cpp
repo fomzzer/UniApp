@@ -10,11 +10,17 @@ int main(int argc, char *argv[])
     DashboardWindow *dashWin = new DashboardWindow();
 
     QObject::connect(logWin, &LoginWindow::loginSuccessful, [=](const QString &userName, const QStringList &userInfo) {
+        dashWin->clearDashboardWindow();
         dashWin->setUserName(userName);
         dashWin->setUserInfo(userInfo);
         logWin->hide();
         dashWin->show();
-        logWin->deleteLater();
+    });
+
+    QObject::connect(dashWin, &DashboardWindow::logoutRequested, [=]() {
+        logWin->clearLoginWindow();
+        dashWin->hide();
+        logWin->show();
     });
 
     logWin->show();

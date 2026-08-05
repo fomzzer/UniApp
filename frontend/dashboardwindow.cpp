@@ -9,8 +9,6 @@
 #include <QSet>
 #include <QMessageBox>
 
-#include <QDebug>
-
 DashboardWindow::DashboardWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::DashboardWindow)
@@ -41,6 +39,11 @@ DashboardWindow::DashboardWindow(QWidget *parent)
 
     connect(ui->btn_info, &QPushButton::clicked, [=]() {
         ui->stackedWidget->setCurrentIndex(4);
+    });
+
+    connect(ui->btn_logout, &QPushButton::clicked, this, [=]() {
+        ui->lbl_name->clear();
+        emit logoutRequested();
     });
 
     fetchSchedules();
@@ -84,7 +87,13 @@ DashboardWindow::DashboardWindow(QWidget *parent)
         }
     });
 
-    connect(ui->btn_update_data, &QPushButton::clicked, this, &DashboardWindow::fetchSchedules);
+    connect(ui->btn_update_data, &QPushButton::clicked, this, [=](){
+        ui->combo_faculty->setCurrentIndex(0);
+        ui->combo_speciality->setCurrentIndex(0);
+        ui->combo_course->setCurrentIndex(0);
+        ui->combo_stream->setCurrentIndex(0);
+        fetchSchedules();
+    });
 }
 
 DashboardWindow::~DashboardWindow()
@@ -283,4 +292,16 @@ QString DashboardWindow::getAcronym(const QString fullWord) {
     }
 
     return acronym;
+}
+
+void DashboardWindow::clearDashboardWindow() {
+    ui->lbl_name->clear();
+    ui->lbl_facultyno->setText("Факультетный номер:");
+    ui->lbl_faculty->setText("Факультет:");
+    ui->lbl_speciality->setText("Специальность:");
+    ui->lbl_typestyding->setText("Вид обучения:");
+    ui->lbl_group->setText("Группа:");
+    ui->lbl_stream->setText("Поток:");
+    ui->lbl_semester->setText("Семестр:");
+    ui->lbl_course->setText("Курс:");
 }

@@ -42,6 +42,30 @@ QPushButton:hover {
     border-left: 4px solid #0056A4;
 }
 
+QPushButton#btn_logout {
+    background-color: transparent;
+    color: #8B949E;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 8px 16px;
+    text-align: left;
+    font-family: &quot;Segoe UI&quot;, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+QPushButton#btn_logout:hover {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+QPushButton#btn_logout:pressed {
+    background-color: #dc2626;
+    color: white;
+    border: 1px solid #dc2626;
+}
+
 QTableWidget {
     background-color: #1C2128;
     color: #FFFFFF;
@@ -304,10 +328,17 @@ QLabel#label_8 {
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>150</height>
+             <height>125</height>
             </size>
            </property>
           </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_logout">
+           <property name="text">
+            <string>Выход</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -392,7 +423,7 @@ QLabel#label_8 {
             <item>
              <widget class="QLabel" name="lbl_facultyno">
               <property name="text">
-               <string>Факультетный номер: </string>
+               <string>Факультетный номер:</string>
               </property>
               <property name="textFormat">
                <enum>Qt::TextFormat::PlainText</enum>
@@ -402,7 +433,7 @@ QLabel#label_8 {
             <item>
              <widget class="QLabel" name="lbl_faculty">
               <property name="text">
-               <string>Факультет: </string>
+               <string>Факультет:</string>
               </property>
               <property name="textFormat">
                <enum>Qt::TextFormat::PlainText</enum>
@@ -412,7 +443,7 @@ QLabel#label_8 {
             <item>
              <widget class="QLabel" name="lbl_speciality">
               <property name="text">
-               <string>Специальность: </string>
+               <string>Специальность:</string>
               </property>
               <property name="textFormat">
                <enum>Qt::TextFormat::PlainText</enum>
