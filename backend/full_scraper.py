@@ -6,6 +6,7 @@ import time
 import logging
 import ddddocr
 import re
+from urllib.parse import urljoin
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -83,7 +84,7 @@ def get_info(credentials: LoginData):
     headers = {"User-Agent": "Mozilla/5.0"}
 
     is_2fa = len(credentials.auth_code) == 6 and credentials.auth_code.isdigit()
-    max_attempts = 1 if is_2fa else 3 
+    max_attempts = 1 if is_2fa else 7 
 
     session = requests.Session()
 
@@ -145,7 +146,17 @@ def get_info(credentials: LoginData):
                                 if key:
                                     all_info[key] = val
                     
-                    student_grades = parse_grades(soup)
+                    student_grades = []
+                    grades_link = soup.find('a', string=re.compile(r"Заверки и оценки"))
+                    
+                    if grades_link and 'href' in grades_link.attrs:
+                        grades_url = urljoin(url, grades_link['href'])
+                        grades_response = session.get(grades_url, headers=headers, timeout=10)
+                        grades_soup = BeautifulSoup(grades_response.text, 'lxml')
+                        
+                        student_grades = parse_grades(grades_soup)
+                    else:
+                        logger.error("Не удалось найти ссылку на оценки на главной странице")
 
                     return {
                         'status': 'success',
