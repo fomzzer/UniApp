@@ -101,7 +101,9 @@ void LoginWindow::onServerResponse(QNetworkReply* reply) {
 
     ui->pushButton->setText("Получаем данные...");
 
-    if (replyJson.contains("status") && replyJson["status"].toString() == "success") {
+    if (replyJson.contains("status") && replyJson["status"].toString() == "success" && replyJson.contains("grades")) {
+        QJsonArray gradesInfo = replyJson["grades"].toArray();
+
         ui->pushButton->setText("Войти");
         QString userName = replyJson["name"].toString();
         QJsonObject userInfoObject = replyJson["info"].toObject();
@@ -114,7 +116,8 @@ void LoginWindow::onServerResponse(QNetworkReply* reply) {
         QString semester = userInfoObject["Записан семестър"].toString();
         QString course = QString::number((semester.toInt() + 1) / 2);
         QString currentFactCourse = QString::number((semester.toInt() - 1) / 2);
-        QStringList userInfo = {facultyNo, faculty, speciality, typeStydying, group, stream, semester, course, currentFactCourse};
+        QString degree = userInfoObject["ОКС"].toString();
+        QStringList userInfo = {facultyNo, faculty, speciality, typeStydying, group, stream, semester, course, currentFactCourse, degree};
 
         QSettings settings;
 
@@ -129,7 +132,7 @@ void LoginWindow::onServerResponse(QNetworkReply* reply) {
             settings.remove("password");
         }
 
-        emit loginSuccessful(userName, userInfo);
+        emit loginSuccessful(userName, userInfo, gradesInfo);
     }
     else {
         ui->pushButton->setText("Войти");

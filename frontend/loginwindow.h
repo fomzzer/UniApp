@@ -23,7 +23,7 @@ public:
     void clearLoginWindow();
 
 signals:
-    void loginSuccessful(const QString &userName, const QStringList &userInfo);
+    void loginSuccessful(const QString &userName, const QStringList &userInfo, const QJsonArray &gradesInfo);
 
 private slots:
     void onLoginButtonClicked();

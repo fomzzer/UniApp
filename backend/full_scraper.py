@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import time
 import logging
 import ddddocr
+import re
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -15,6 +16,66 @@ ocr = ddddocr.DdddOcr(show_ad=False)
 class LoginData(BaseModel):
     faculty_no: str
     auth_code: str
+
+def parse_grades(soup):
+    grades_list = []
+    
+    tables = soup.find_all('table')
+    grades_table = None
+    for tbl in tables:
+        if "Дисциплина" in tbl.text:
+            grades_table = tbl
+            break
+
+    if not grades_table:
+        return []
+
+    for tr in grades_table.find_all('tr')[1:]:
+        tds = tr.find_all('td')
+        if not tds:
+            continue
+            
+        first_td = tds[0]
+        b_tag = first_td.find('b')
+        
+        if not b_tag:
+            continue
+            
+        subject_name = b_tag.text.strip()
+        full_text = first_td.get_text(separator=' ', strip=True)
+        
+        type_match = re.search(r'\((.*?)\)', full_text.replace(subject_name, ''))
+        control_type = type_match.group(1) if type_match else ""
+        
+        grade_matches = re.findall(r'([А-Яа-я\.\s]+\(\d\))\s*\((редовна|поправителна)\)', full_text)
+        
+        regular_grade = "-"
+        retake_grade = "-"
+        final_grade = "-"
+        
+        if "Зачита се" in full_text:
+            regular_grade = "Зачита се"
+            final_grade = "Зачита се"
+            
+        for grade_val, try_type in grade_matches:
+            grade_val = grade_val.strip()
+            if try_type == 'редовна':
+                regular_grade = grade_val
+                final_grade = grade_val
+            elif try_type == 'поправителна':
+                retake_grade = grade_val
+                final_grade = grade_val
+                
+        grades_list.append({
+            "subject": subject_name,
+            "type": control_type,
+            "regular": regular_grade,
+            "retake": retake_grade,
+            "final": final_grade
+        })
+        
+    return grades_list
+
 
 @app.post("/api/login")
 def get_info(credentials: LoginData):
@@ -83,11 +144,14 @@ def get_info(credentials: LoginData):
 
                                 if key:
                                     all_info[key] = val
+                    
+                    student_grades = parse_grades(soup)
 
                     return {
                         'status': 'success',
                         'name': full_name,
-                        'info': all_info
+                        'info': all_info,
+                        'grades': student_grades
                     }
                 else:
                     return {'status': 'error', 'message': "Failed to parse information"}

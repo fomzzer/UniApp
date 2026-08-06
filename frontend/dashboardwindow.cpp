@@ -16,7 +16,19 @@ DashboardWindow::DashboardWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
+
+    ui->tableWidget->verticalHeader()->setVisible(false);
+
     ui->stackedWidget->setCurrentIndex(0);
 
     networkManager = new QNetworkAccessManager(this);
@@ -261,6 +273,7 @@ void DashboardWindow::setUserName(const QString &name) {
 }
 
 void DashboardWindow::setUserInfo(const QStringList &info) {
+    ui->lbl_degree->setText(ui->lbl_degree->text().append(" " + info[9]));
     ui->lbl_facultyno->setText(ui->lbl_facultyno->text().append(" " + info[0]));
     ui->lbl_faculty->setText(ui->lbl_faculty->text().append(" " + info[1]));
     ui->lbl_speciality->setText(ui->lbl_speciality->text().append(" " + info[2]));
@@ -278,6 +291,33 @@ void DashboardWindow::setUserInfo(const QStringList &info) {
 
     if (!schedules.isEmpty()) {
         setDefaultSchedule(scheduleInfo);
+    }
+}
+
+void DashboardWindow::setUserGrades(const QJsonArray &gradesInfo) {
+    ui->tableWidget->setRowCount(0);
+
+    for (int i = 0; i < gradesInfo.size(); ++i) {
+        QJsonObject gradesObj = gradesInfo[i].toObject();
+
+        int row = ui->tableWidget->rowCount();
+        ui->tableWidget->insertRow(row);
+
+        ui->tableWidget->setItem(row, 0, new QTableWidgetItem(gradesObj["subject"].toString()));
+        ui->tableWidget->setItem(row, 1, new QTableWidgetItem(gradesObj["type"].toString()));
+        ui->tableWidget->setItem(row, 2, new QTableWidgetItem(gradesObj["regular"].toString()));
+        ui->tableWidget->setItem(row, 3, new QTableWidgetItem(gradesObj["retake"].toString()));
+
+        QTableWidgetItem *finalGrade = new QTableWidgetItem(gradesObj["final"].toString());
+
+        if (gradesObj["final"].toString().contains("(2)")) {
+            finalGrade->setForeground(QBrush(QColor("#ef4444")));
+        }
+        else if (gradesObj["final"].toString().contains("(5)") || gradesObj["final"].toString().contains("(6)")) {
+            finalGrade->setForeground(QBrush(QColor("#22c55e")));
+        }
+
+        ui->tableWidget->setItem(row, 4, finalGrade);
     }
 }
 
@@ -300,6 +340,7 @@ QString DashboardWindow::getAcronym(const QString fullWord) {
 
 void DashboardWindow::clearDashboardWindow() {
     ui->lbl_name->clear();
+    ui->lbl_degree->setText("Степень:");
     ui->lbl_facultyno->setText("Факультетный номер:");
     ui->lbl_faculty->setText("Факультет:");
     ui->lbl_speciality->setText("Специальность:");

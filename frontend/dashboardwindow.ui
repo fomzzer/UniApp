@@ -424,6 +424,13 @@ QLabel#label_8 {
              </widget>
             </item>
             <item>
+             <widget class="QLabel" name="lbl_degree">
+              <property name="text">
+               <string>Степень:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QLabel" name="lbl_facultyno">
               <property name="text">
                <string>Факультетный номер:</string>
