@@ -29,7 +29,7 @@ def parse_grades(soup):
             break
             
     if not grades_table:
-        logger.error("РАДАР: Таблица с оценками (Дисциплина + Лекции) не найдена на странице!")
+        logger.warning("Target grades table ('дисциплина', 'лекции') not found in the DOM.")
         return []
         
     for tr in grades_table.find_all('tr')[1:]:
@@ -47,6 +47,9 @@ def parse_grades(soup):
         if not subject_name:
             continue
             
+        if "сем." in subject_name.lower() and len(subject_name) < 15:
+            continue
+            
         type_match = re.search(r'\((.*?)\)', full_text)
         control_type = type_match.group(1).strip() if type_match else ""
         
@@ -58,7 +61,8 @@ def parse_grades(soup):
             regular_grade = "Зачита се"
             final_grade = "Зачита се"
         else:
-            grade_matches = re.findall(r'([^,:]+?\(\d\))\s*\((редовна|поправителна)\)', full_text, re.IGNORECASE)
+            grade_matches = re.findall(r'((?:Слаб|Среден|Добър|Мн\.\s*добър|Отличен)\s*\(\d\))\s*\((редовна|поправителна)\)', full_text, re.IGNORECASE)
+            
             for grade_val, try_type in grade_matches:
                 grade_val = grade_val.strip()
                 if try_type.lower() == 'редовна':
@@ -78,7 +82,7 @@ def parse_grades(soup):
             })
             
     if not grades_list:
-        logger.error("РАДАР: Таблица найдена, но парсер не смог извлечь ни одной оценки! Структура HTML:")
+        logger.error("Grades table identified, but record extraction yielded no results. DOM snapshot follows:")
         logger.error(grades_table.prettify()[:2000])
         
     return grades_list
@@ -112,7 +116,7 @@ def get_info(credentials: LoginData):
                     for digit, letter in replacements.items():
                         captcha_text = captcha_text.replace(digit, letter)
                         
-                    logger.info(f"Attempt {attempt + 1}: AI CAPTCHA processed: {captcha_text}")
+                    logger.info(f"Authentication attempt {attempt + 1}: CAPTCHA resolved as '{captcha_text}'.")
 
             data = {
                 'fnum': credentials.faculty_no,
@@ -188,13 +192,13 @@ def get_info(credentials: LoginData):
             if is_2fa:
                 break
             
-            logger.warning("Login failed, retrying with new CAPTCHA...")
+            logger.warning("Authentication unsuccessful. Retrying with a new CAPTCHA challenge...")
             time.sleep(0.5)
 
         return {'status': 'error', 'message': "Invalid credentials or CAPTCHA"}
 
     except Exception as e:
-        logger.error(f"Request error: {e}")
+        logger.error(f"Session request failed due to exception: {e}")
         return {'status': 'error', 'message': f"Server connection error: {str(e)}"}
 
 
@@ -255,7 +259,7 @@ def get_schedule():
                 time.sleep(0.5)
 
             except Exception as e:
-                logger.error(f"Error with {faculty_id}: {e}")
+                logger.error(f"Schedule retrieval failed for faculty ID {faculty_id}. Exception: {e}")
                 continue
 
         return all_schedules

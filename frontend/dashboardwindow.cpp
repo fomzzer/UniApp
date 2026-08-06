@@ -27,6 +27,9 @@ DashboardWindow::DashboardWindow(QWidget *parent)
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
 
+    ui->tableWidget->setWordWrap(true);
+    ui->tableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
     ui->tableWidget->verticalHeader()->setVisible(false);
 
     ui->stackedWidget->setCurrentIndex(0);
@@ -303,21 +306,40 @@ void DashboardWindow::setUserGrades(const QJsonArray &gradesInfo) {
         int row = ui->tableWidget->rowCount();
         ui->tableWidget->insertRow(row);
 
-        ui->tableWidget->setItem(row, 0, new QTableWidgetItem(gradesObj["subject"].toString()));
-        ui->tableWidget->setItem(row, 1, new QTableWidgetItem(gradesObj["type"].toString()));
-        ui->tableWidget->setItem(row, 2, new QTableWidgetItem(gradesObj["regular"].toString()));
-        ui->tableWidget->setItem(row, 3, new QTableWidgetItem(gradesObj["retake"].toString()));
+        QTableWidgetItem *subjectItem = new QTableWidgetItem(gradesObj["subject"].toString());
+        QTableWidgetItem *typeItem = new QTableWidgetItem(gradesObj["type"].toString());
+        QTableWidgetItem *regItem = new QTableWidgetItem(gradesObj["regular"].toString());
+        QTableWidgetItem *retakeItem = new QTableWidgetItem(gradesObj["retake"].toString());
 
-        QTableWidgetItem *finalGrade = new QTableWidgetItem(gradesObj["final"].toString());
+        QString finalGradeStr = gradesObj["final"].toString();
+        QTableWidgetItem *finalGradeItem = new QTableWidgetItem(finalGradeStr);
 
-        if (gradesObj["final"].toString().contains("(2)")) {
-            finalGrade->setForeground(QBrush(QColor(0xef4444)));
+        typeItem->setTextAlignment(Qt::AlignCenter);
+        regItem->setTextAlignment(Qt::AlignCenter);
+        retakeItem->setTextAlignment(Qt::AlignCenter);
+        finalGradeItem->setTextAlignment(Qt::AlignCenter);
+
+        if (finalGradeStr.contains("(2)")) {
+            finalGradeItem->setForeground(QBrush(QColor(0xef4444)));
         }
-        else if (gradesObj["final"].toString().contains("(5)") || gradesObj["final"].toString().contains("(6)")) {
-            finalGrade->setForeground(QBrush(QColor(0x22c55e)));
+        else if (finalGradeStr.contains("(3)")) {
+            finalGradeItem->setForeground(QBrush(QColor(0xf97316)));
+        }
+        else if (finalGradeStr.contains("(4)")) {
+            finalGradeItem->setForeground(QBrush(QColor(0xeab308)));
+        }
+        else if (finalGradeStr.contains("(5)")) {
+            finalGradeItem->setForeground(QBrush(QColor(0x84cc16)));
+        }
+        else if (finalGradeStr.contains("(6)") || finalGradeStr.contains("Зачита се", Qt::CaseInsensitive)) {
+            finalGradeItem->setForeground(QBrush(QColor(0x22c55e)));
         }
 
-        ui->tableWidget->setItem(row, 4, finalGrade);
+        ui->tableWidget->setItem(row, 0, subjectItem);
+        ui->tableWidget->setItem(row, 1, typeItem);
+        ui->tableWidget->setItem(row, 2, regItem);
+        ui->tableWidget->setItem(row, 3, retakeItem);
+        ui->tableWidget->setItem(row, 4, finalGradeItem);
     }
 }
 

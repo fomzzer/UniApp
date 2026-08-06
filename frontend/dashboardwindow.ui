@@ -216,6 +216,10 @@ QLabel#label_8 {
     background-color: #161B22;
     border-radius: 8px;
     border: 1px solid #30363D;
+}
+
+QTableWidget::item {
+    padding: 8px 4px;
 }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
