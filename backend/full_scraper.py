@@ -40,14 +40,23 @@ def parse_grades(soup):
         first_td = tds[0]
         full_text = first_td.get_text(separator=' ', strip=True)
         
+        semester_match = re.match(r'^(\d+\s*сем\.)\s*(.*)', full_text, re.IGNORECASE)
+        if semester_match:
+            sem_text = semester_match.group(1).strip()
+            grades_list.append({
+                "is_semester": True,
+                "title": sem_text
+            })
+            full_text = semester_match.group(2).strip()
+            
+        if not full_text:
+            continue
+
         if "(" not in full_text and "зачита се" not in full_text.lower():
             continue
             
         subject_name = full_text.split('(')[0].strip()
         if not subject_name:
-            continue
-            
-        if "сем." in subject_name.lower() and len(subject_name) < 15:
             continue
             
         type_match = re.search(r'\((.*?)\)', full_text)
@@ -62,7 +71,6 @@ def parse_grades(soup):
             final_grade = "Зачита се"
         else:
             grade_matches = re.findall(r'((?:Слаб|Среден|Добър|Мн\.\s*добър|Отличен)\s*\(\d\))\s*\((редовна|поправителна)\)', full_text, re.IGNORECASE)
-            
             for grade_val, try_type in grade_matches:
                 grade_val = grade_val.strip()
                 if try_type.lower() == 'редовна':

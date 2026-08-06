@@ -28,6 +28,7 @@ DashboardWindow::DashboardWindow(QWidget *parent)
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
 
     ui->tableWidget->setWordWrap(true);
+    ui->tableWidget->setTextElideMode(Qt::ElideNone);
     ui->tableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     ui->tableWidget->verticalHeader()->setVisible(false);
@@ -300,11 +301,29 @@ void DashboardWindow::setUserInfo(const QStringList &info) {
 void DashboardWindow::setUserGrades(const QJsonArray &gradesInfo) {
     ui->tableWidget->setRowCount(0);
 
+    double totalSum = 0.0;
+    int gradeCount = 0;
+
     for (int i = 0; i < gradesInfo.size(); ++i) {
         QJsonObject gradesObj = gradesInfo[i].toObject();
-
         int row = ui->tableWidget->rowCount();
         ui->tableWidget->insertRow(row);
+
+        if (gradesObj.contains("is_semester") && gradesObj["is_semester"].toBool()) {
+            QTableWidgetItem *semItem = new QTableWidgetItem(gradesObj["title"].toString());
+            semItem->setTextAlignment(Qt::AlignCenter);
+
+            QFont font = semItem->font();
+            font.setBold(true);
+            semItem->setFont(font);
+
+            semItem->setBackground(QBrush(QColor(0x2d333b)));
+            semItem->setForeground(QBrush(QColor(0x58a6ff)));
+
+            ui->tableWidget->setItem(row, 0, semItem);
+            ui->tableWidget->setSpan(row, 0, 1, 5);
+            continue;
+        }
 
         QTableWidgetItem *subjectItem = new QTableWidgetItem(gradesObj["subject"].toString());
         QTableWidgetItem *typeItem = new QTableWidgetItem(gradesObj["type"].toString());
@@ -319,19 +338,25 @@ void DashboardWindow::setUserGrades(const QJsonArray &gradesInfo) {
         retakeItem->setTextAlignment(Qt::AlignCenter);
         finalGradeItem->setTextAlignment(Qt::AlignCenter);
 
+        QRegularExpression re("\\((\\d+)\\)");
+        QRegularExpressionMatch match = re.match(finalGradeStr);
+        if (match.hasMatch()) {
+            int val = match.captured(1).toInt();
+            if (val >= 2 && val <= 6) {
+                totalSum += val;
+                gradeCount++;
+            }
+        }
+
         if (finalGradeStr.contains("(2)")) {
             finalGradeItem->setForeground(QBrush(QColor(0xef4444)));
-        }
-        else if (finalGradeStr.contains("(3)")) {
+        } else if (finalGradeStr.contains("(3)")) {
             finalGradeItem->setForeground(QBrush(QColor(0xf97316)));
-        }
-        else if (finalGradeStr.contains("(4)")) {
+        } else if (finalGradeStr.contains("(4)")) {
             finalGradeItem->setForeground(QBrush(QColor(0xeab308)));
-        }
-        else if (finalGradeStr.contains("(5)")) {
+        } else if (finalGradeStr.contains("(5)")) {
             finalGradeItem->setForeground(QBrush(QColor(0x84cc16)));
-        }
-        else if (finalGradeStr.contains("(6)") || finalGradeStr.contains("Зачита се", Qt::CaseInsensitive)) {
+        } else if (finalGradeStr.contains("(6)") || finalGradeStr.contains("Зачита се", Qt::CaseInsensitive)) {
             finalGradeItem->setForeground(QBrush(QColor(0x22c55e)));
         }
 
@@ -340,6 +365,41 @@ void DashboardWindow::setUserGrades(const QJsonArray &gradesInfo) {
         ui->tableWidget->setItem(row, 2, regItem);
         ui->tableWidget->setItem(row, 3, retakeItem);
         ui->tableWidget->setItem(row, 4, finalGradeItem);
+    }
+
+    if (gradeCount > 0) {
+        double gpa = totalSum / gradeCount;
+
+        int row = ui->tableWidget->rowCount();
+        ui->tableWidget->insertRow(row);
+
+        QTableWidgetItem *gpaTitleItem = new QTableWidgetItem("Общ среден успех (GPA):");
+        gpaTitleItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+
+        QFont font = gpaTitleItem->font();
+        font.setBold(true);
+        gpaTitleItem->setFont(font);
+
+        QString gpaStr = QString::number(gpa, 'f', 2);
+        QTableWidgetItem *gpaValItem = new QTableWidgetItem(gpaStr);
+        gpaValItem->setTextAlignment(Qt::AlignCenter);
+        gpaValItem->setFont(font);
+
+        if (gpa < 3.0) {
+            gpaValItem->setForeground(QBrush(QColor(0xef4444)));
+        } else if (gpa < 4.0) {
+            gpaValItem->setForeground(QBrush(QColor(0xf97316)));
+        } else if (gpa < 5.0) {
+            gpaValItem->setForeground(QBrush(QColor(0xeab308)));
+        } else if (gpa < 6.0) {
+            gpaValItem->setForeground(QBrush(QColor(0x84cc16)));
+        } else {
+            gpaValItem->setForeground(QBrush(QColor(0x22c55e)));
+        }
+
+        ui->tableWidget->setItem(row, 0, gpaTitleItem);
+        ui->tableWidget->setSpan(row, 0, 1, 4);
+        ui->tableWidget->setItem(row, 4, gpaValItem);
     }
 }
 
