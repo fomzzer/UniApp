@@ -24,8 +24,8 @@ def parse_grades(soup):
     tables = soup.find_all('table')
     grades_table = None
     for tbl in tables:
-        tbl_text = tbl.get_text().lower()
-        if "дисциплина" in tbl_text and "оценка" in tbl_text:
+        first_row = tbl.find('tr')
+        if first_row and "дисциплина" in first_row.get_text().lower():
             grades_table = tbl
             break
 
@@ -49,7 +49,7 @@ def parse_grades(soup):
         
         text_after_subject = full_text.replace(subject_name, '', 1).strip()
         type_match = re.search(r'^\((.*?)\)', text_after_subject)
-        control_type = type_match.group(1) if type_match else ""
+        control_type = type_match.group(1).strip() if type_match else ""
         
         grade_matches = re.findall(r'([А-Яа-я\.\s]+\(\d\))\s*\((редовна|поправителна)\)', full_text)
         
@@ -57,7 +57,7 @@ def parse_grades(soup):
         retake_grade = "-"
         final_grade = "-"
         
-        if "Зачита се" in full_text:
+        if "зачита се" in full_text.lower():
             regular_grade = "Зачита се"
             final_grade = "Зачита се"
             
@@ -65,10 +65,10 @@ def parse_grades(soup):
             grade_val = grade_val.strip()
             grade_val = re.sub(r'[,:;]+$', '', grade_val).strip()
             
-            if try_type == 'редовна':
+            if try_type.lower() == 'редовна':
                 regular_grade = grade_val
                 final_grade = grade_val
-            elif try_type == 'поправителна':
+            elif try_type.lower() == 'поправителна':
                 retake_grade = grade_val
                 final_grade = grade_val
                 
@@ -125,7 +125,7 @@ def get_info(credentials: LoginData):
 
             post_response = session.post(url, headers=headers, data=data, timeout=10)
             
-            post_response.encoding = 'windows-1251'
+            post_response.encoding = 'utf-8'
 
             soup = BeautifulSoup(post_response.text, 'html.parser')
             logout_btn = soup.find('input', id='izh')
@@ -165,7 +165,7 @@ def get_info(credentials: LoginData):
                     grades_url = urljoin(url, grades_link['href'])
                     grades_response = session.get(grades_url, headers=headers, timeout=10)
                     
-                    grades_response.encoding = 'windows-1251'
+                    grades_response.encoding = 'utf-8'
                     grades_soup = BeautifulSoup(grades_response.text, 'html.parser')
                     
                     student_grades = parse_grades(grades_soup)
