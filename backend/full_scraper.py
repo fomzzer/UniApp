@@ -127,7 +127,6 @@ def get_info(credentials: LoginData):
             post_response.encoding = 'utf-8'
 
             soup = BeautifulSoup(post_response.text, 'lxml')
-            
             logout_btn = soup.find('input', id='izh')
 
             if logout_btn:
@@ -153,27 +152,20 @@ def get_info(credentials: LoginData):
                                 all_info[key] = val
                 
                 student_grades = []
-                grades_link = None
+                form_data = {}
                 
-                for a in soup.find_all('a', href=True):
-                    text = a.get_text(strip=True).lower()
-                    href = a['href'].lower()
-                    if "оценк" in text or "заверк" in text or "zav" in href or "ocen" in href:
-                        grades_link = a
-                        break
+                for inp in soup.find_all('input', type='hidden'):
+                    name = inp.get('name') or inp.get('id')
+                    if name:
+                        form_data[name] = inp.get('value', '')
+
+                form_data['deistvie'] = '1'
+
+                grades_response = session.post(url, headers=headers, data=form_data, timeout=10)
+                grades_response.encoding = 'utf-8'
+                grades_soup = BeautifulSoup(grades_response.text, 'lxml')
                 
-                if grades_link:
-                    grades_url = urljoin(url, grades_link['href'])
-                    grades_response = session.get(grades_url, headers=headers, timeout=10)
-                    grades_response.encoding = 'utf-8'
-                    
-                    grades_soup = BeautifulSoup(grades_response.text, 'lxml')
-                    student_grades = parse_grades(grades_soup)
-                else:
-                    logger.error("Не удалось найти ссылку на оценки! Список всех найденных ссылок на странице:")
-                    all_links = soup.find_all('a', href=True)
-                    for a in all_links:
-                        logger.error(f"TEXT: '{a.get_text(strip=True)}' | HREF: '{a['href']}'")
+                student_grades = parse_grades(grades_soup)
 
                 return {
                     'status': 'success',
