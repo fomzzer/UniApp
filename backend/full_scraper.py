@@ -30,7 +30,7 @@ def parse_grades(soup):
             break
 
     if not grades_table:
-        logger.error("Таблица с оценками не найдена на странице.")
+        logger.error("Таблица с оценками не найдена на странице оценок.")
         return []
 
     for tr in grades_table.find_all('tr')[1:]:
@@ -124,10 +124,10 @@ def get_info(credentials: LoginData):
                 data['egn'] = credentials.auth_code
 
             post_response = session.post(url, headers=headers, data=data, timeout=10)
-            
             post_response.encoding = 'utf-8'
 
-            soup = BeautifulSoup(post_response.text, 'html.parser')
+            soup = BeautifulSoup(post_response.text, 'lxml')
+            
             logout_btn = soup.find('input', id='izh')
 
             if logout_btn:
@@ -157,20 +157,23 @@ def get_info(credentials: LoginData):
                 
                 for a in soup.find_all('a', href=True):
                     text = a.get_text(strip=True).lower()
-                    if "оценки" in text:
+                    href = a['href'].lower()
+                    if "оценк" in text or "заверк" in text or "zav" in href or "ocen" in href:
                         grades_link = a
                         break
                 
                 if grades_link:
                     grades_url = urljoin(url, grades_link['href'])
                     grades_response = session.get(grades_url, headers=headers, timeout=10)
-                    
                     grades_response.encoding = 'utf-8'
-                    grades_soup = BeautifulSoup(grades_response.text, 'html.parser')
                     
+                    grades_soup = BeautifulSoup(grades_response.text, 'lxml')
                     student_grades = parse_grades(grades_soup)
                 else:
-                    logger.error("Не удалось найти ссылку на оценки на главной странице")
+                    logger.error("Не удалось найти ссылку на оценки! Список всех найденных ссылок на странице:")
+                    all_links = soup.find_all('a', href=True)
+                    for a in all_links:
+                        logger.error(f"TEXT: '{a.get_text(strip=True)}' | HREF: '{a['href']}'")
 
                 return {
                     'status': 'success',
@@ -211,7 +214,7 @@ def get_schedule():
                     continue
                 
                 response.encoding = 'utf-8'
-                soup = BeautifulSoup(response.text, 'html.parser')
+                soup = BeautifulSoup(response.text, 'lxml')
                 all_tables = soup.find_all('table')
                 valid_tables = [t for t in all_tables if "Специалност" in t.text and "Поток" in t.text]
 

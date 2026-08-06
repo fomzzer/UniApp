@@ -311,10 +311,10 @@ void DashboardWindow::setUserGrades(const QJsonArray &gradesInfo) {
         QTableWidgetItem *finalGrade = new QTableWidgetItem(gradesObj["final"].toString());
 
         if (gradesObj["final"].toString().contains("(2)")) {
-            finalGrade->setForeground(QBrush(QColor("#ef4444")));
+            finalGrade->setForeground(QBrush(QColor(0xef4444)));
         }
         else if (gradesObj["final"].toString().contains("(5)") || gradesObj["final"].toString().contains("(6)")) {
-            finalGrade->setForeground(QBrush(QColor("#22c55e")));
+            finalGrade->setForeground(QBrush(QColor(0x22c55e)));
         }
 
         ui->tableWidget->setItem(row, 4, finalGrade);
