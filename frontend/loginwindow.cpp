@@ -120,7 +120,8 @@ void LoginWindow::onServerResponse(QNetworkReply* reply) {
         QString course = QString::number((semester.toInt() + 1) / 2);
         QString currentFactCourse = QString::number((semester.toInt() - 1) / 2);
         QString degree = userInfoObject["ОКС"].toString();
-        QStringList userInfo = {facultyNo, faculty, speciality, typeStydying, group, stream, semester, course, currentFactCourse, degree};
+        QString tuEmail = userInfoObject["Имейл в ТУ - София"].toString();
+        QStringList userInfo = {facultyNo, faculty, speciality, typeStydying, group, stream, semester, course, currentFactCourse, degree, tuEmail};
 
         QSettings settings;
 

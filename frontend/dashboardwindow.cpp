@@ -286,6 +286,7 @@ void DashboardWindow::setUserInfo(const QStringList &info) {
     ui->lbl_stream->setText(ui->lbl_stream->text().append(" " + info[5]));
     ui->lbl_semester->setText(ui->lbl_semester->text().append(" " + info[6]));
     ui->lbl_course->setText(ui->lbl_course->text().append(" " + info[7]));
+    ui->lbl_tuemail->setText(ui->lbl_tuemail->text().append(" " + info[10]));
 
     scheduleInfo.clear();
     scheduleInfo.append(getAcronym(info[1]));
@@ -435,5 +436,6 @@ void DashboardWindow::clearDashboardWindow() {
     ui->lbl_stream->setText("Поток:");
     ui->lbl_semester->setText("Семестр:");
     ui->lbl_course->setText("Курс:");
+    ui->lbl_tuemail->setText("Ваш email в ТУ - София:");
     ui->stackedWidget->setCurrentIndex(0);
 }

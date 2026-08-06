@@ -136,7 +136,7 @@ def get_info(credentials: LoginData):
     headers = {"User-Agent": "Mozilla/5.0"}
 
     is_2fa = len(credentials.auth_code) == 6 and credentials.auth_code.isdigit()
-    max_attempts = 1 if is_2fa else 7 
+    max_attempts = 1 if is_2fa else 10 
 
     session = requests.Session()
 
