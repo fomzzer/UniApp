@@ -98,7 +98,6 @@ def parse_grades(soup):
 
 def parse_dormitory(soup):
     dorm_info = {}
-    
     message = ""
     
     header = soup.find(lambda tag: tag.name in ['b', 'h1', 'h2', 'h3', 'div', 'font'] and 'общежития' in tag.get_text().lower())
@@ -118,13 +117,14 @@ def parse_dormitory(soup):
             if text and len(text) > 10:
                 lower_text = text.lower()
                 nav_matches = sum(1 for kw in nav_keywords if kw in lower_text)
-                
                 if nav_matches < 2 and not text.startswith('[') and 'университет' not in lower_text:
                     message = text
                     break
                     
     if not message:
         message = "Информация об общежитии временно недоступна."
+    else:
+        message = message.replace(". ", ".\n\n")
         
     dorm_info["status"] = message
     return dorm_info

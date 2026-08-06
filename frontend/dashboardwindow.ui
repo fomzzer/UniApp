@@ -10,9 +10,21 @@
     <height>600</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="minimumSize">
    <size>
-    <width>800</width>
+    <width>900</width>
+    <height>600</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>900</width>
     <height>600</height>
    </size>
   </property>
@@ -208,18 +220,17 @@ QLabel#label_7 {
     padding-top: 20px;
 }
 
-QLabel#label_8 {
-    font-size: 15px;
-    color: #8B949E;
-    line-height: 1.5;
-    padding: 10px;
-    background-color: #161B22;
-    border-radius: 8px;
-    border: 1px solid #30363D;
-}
-
 QTableWidget::item {
     padding: 8px 4px;
+}
+
+QLabel#label_8 {
+    background-color: #21262d;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 16px;
+    color: #c9d1d9;
+    font-size: 14px;
 }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -676,6 +687,9 @@ QTableWidget::item {
              <widget class="QLabel" name="label_8">
               <property name="text">
                <string>Информация об общежитии</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
