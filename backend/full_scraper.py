@@ -99,20 +99,34 @@ def parse_grades(soup):
 def parse_dormitory(soup):
     dorm_info = {}
     
-    target_element = soup.find(
-        lambda tag: tag.name in ['font', 'p', 'div', 'td'] and 
-        any(keyword in tag.get_text().lower() for keyword in ['областта', 'общежит', 'блок', 'стая', 'адрес', 'настаняван'])
-    )
+    message = ""
     
-    if target_element:
-        dorm_info["status"] = target_element.get_text(separator=' ', strip=True)
-    else:
-        paragraphs = [p.get_text(strip=True) for p in soup.find_all(['p', 'font']) if len(p.get_text(strip=True)) > 10]
-        if paragraphs:
-            dorm_info["status"] = " \n".join(paragraphs)
-        else:
-            dorm_info["status"] = "Информация об общежитии временно недоступна."
-            
+    header = soup.find(lambda tag: tag.name in ['b', 'h1', 'h2', 'h3', 'div', 'font'] and 'общежития' in tag.get_text().lower())
+    
+    if header:
+        next_elem = header.find_next(['p', 'div', 'font'])
+        if next_elem:
+            candidate = next_elem.get_text(separator=' ', strip=True)
+            if candidate and "общежития" not in candidate.lower() and len(candidate) > 5:
+                message = candidate
+
+    if not message or "здравно осигуряване" in message.lower():
+        nav_keywords = ['информация', 'здравно осигуряване', 'заверки и оценки', 'спорт', 'стипендии', 'плащания', 'идентификация']
+        
+        for p in soup.find_all(['p', 'font', 'div']):
+            text = p.get_text(separator=' ', strip=True)
+            if text and len(text) > 10:
+                lower_text = text.lower()
+                nav_matches = sum(1 for kw in nav_keywords if kw in lower_text)
+                
+                if nav_matches < 2 and not text.startswith('[') and 'университет' not in lower_text:
+                    message = text
+                    break
+                    
+    if not message:
+        message = "Информация об общежитии временно недоступна."
+        
+    dorm_info["status"] = message
     return dorm_info
 
 
