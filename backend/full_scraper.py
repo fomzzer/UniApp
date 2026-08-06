@@ -124,9 +124,10 @@ def get_info(credentials: LoginData):
                 data['egn'] = credentials.auth_code
 
             post_response = session.post(url, headers=headers, data=data, timeout=10)
-
-            soup = BeautifulSoup(post_response.content, 'html.parser')
             
+            post_response.encoding = 'windows-1251'
+
+            soup = BeautifulSoup(post_response.text, 'html.parser')
             logout_btn = soup.find('input', id='izh')
 
             if logout_btn:
@@ -152,11 +153,11 @@ def get_info(credentials: LoginData):
                                 all_info[key] = val
                 
                 student_grades = []
-                
                 grades_link = None
+                
                 for a in soup.find_all('a', href=True):
                     text = a.get_text(strip=True).lower()
-                    if "заверки" in text and "оценки" in text:
+                    if "оценки" in text:
                         grades_link = a
                         break
                 
@@ -164,7 +165,9 @@ def get_info(credentials: LoginData):
                     grades_url = urljoin(url, grades_link['href'])
                     grades_response = session.get(grades_url, headers=headers, timeout=10)
                     
-                    grades_soup = BeautifulSoup(grades_response.content, 'html.parser')
+                    grades_response.encoding = 'windows-1251'
+                    grades_soup = BeautifulSoup(grades_response.text, 'html.parser')
+                    
                     student_grades = parse_grades(grades_soup)
                 else:
                     logger.error("Не удалось найти ссылку на оценки на главной странице")
@@ -206,8 +209,9 @@ def get_schedule():
                 response = requests.post(url, headers=headers, data=form_data)
                 if response.status_code != 200:
                     continue
-
-                soup = BeautifulSoup(response.content, 'html.parser')
+                
+                response.encoding = 'utf-8'
+                soup = BeautifulSoup(response.text, 'html.parser')
                 all_tables = soup.find_all('table')
                 valid_tables = [t for t in all_tables if "Специалност" in t.text and "Поток" in t.text]
 
