@@ -21,21 +21,32 @@ class LoginData(BaseModel):
 def parse_grades(soup):
     grades_list = []
     
-    tables = soup.find_all('table')
-    grades_table = None
-    for tbl in tables:
-        first_row = tbl.find('tr')
-        if first_row and "дисциплина" in first_row.get_text().lower():
-            grades_table = tbl
-            break
-
+    header_cell = soup.find(lambda tag: tag.name in ['td', 'th'] and 'дисциплина' in tag.get_text().lower())
+    
+    if not header_cell:
+        logger.error("Ячейка 'Дисциплина' не найдена! Возможно, страница пустая.")
+        logger.error(f"Сырой текст страницы (первые 1000 символов):\n{soup.get_text(strip=True)[:1000]}")
+        return []
+        
+    grades_table = header_cell.find_parent('table')
+    
     if not grades_table:
-        logger.error("Таблица с оценками не найдена на странице оценок.")
+        logger.error("Таблица вокруг ячейки не найдена.")
         return []
 
-    for tr in grades_table.find_all('tr')[1:]:
+    found_header = False
+    for tr in grades_table.find_all('tr'):
         tds = tr.find_all('td')
         if not tds:
+            continue
+            
+        row_text = tr.get_text(strip=True).lower()
+        
+        if "дисциплина" in row_text:
+            found_header = True
+            continue
+            
+        if not found_header:
             continue
             
         first_td = tds[0]
@@ -154,14 +165,26 @@ def get_info(credentials: LoginData):
                 student_grades = []
                 form_data = {}
                 
-                for inp in soup.find_all('input', type='hidden'):
-                    name = inp.get('name') or inp.get('id')
-                    if name:
-                        form_data[name] = inp.get('value', '')
+                nav_form = soup.find('form', attrs={'name': 'nav'})
+                action_url = url
+                
+                if nav_form:
+                    if nav_form.get('action'):
+                        action_url = urljoin(url, nav_form.get('action'))
+                        
+                    for inp in nav_form.find_all('input'):
+                        name = inp.get('name') or inp.get('id')
+                        if name:
+                            form_data[name] = inp.get('value', '')
+                else:
+                    for inp in soup.find_all('input', type='hidden'):
+                        name = inp.get('name') or inp.get('id')
+                        if name:
+                            form_data[name] = inp.get('value', '')
 
                 form_data['deistvie'] = '1'
 
-                grades_response = session.post(url, headers=headers, data=form_data, timeout=10)
+                grades_response = session.post(action_url, headers=headers, data=form_data, timeout=10)
                 grades_response.encoding = 'utf-8'
                 grades_soup = BeautifulSoup(grades_response.text, 'lxml')
                 
