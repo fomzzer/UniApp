@@ -99,13 +99,20 @@ def parse_grades(soup):
 def parse_dormitory(soup):
     dorm_info = {}
     
-    red_text = soup.find('font', color='red')
-    if red_text:
-        dorm_info["status"] = red_text.get_text(strip=True)
+    target_element = soup.find(
+        lambda tag: tag.name in ['font', 'p', 'div', 'td'] and 
+        any(keyword in tag.get_text().lower() for keyword in ['областта', 'общежит', 'блок', 'стая', 'адрес', 'настаняван'])
+    )
+    
+    if target_element:
+        dorm_info["status"] = target_element.get_text(separator=' ', strip=True)
     else:
-        body_text = soup.get_text(separator=' ', strip=True)
-        dorm_info["status"] = "Информация получена, но формат требует уточнения."
-        
+        paragraphs = [p.get_text(strip=True) for p in soup.find_all(['p', 'font']) if len(p.get_text(strip=True)) > 10]
+        if paragraphs:
+            dorm_info["status"] = " \n".join(paragraphs)
+        else:
+            dorm_info["status"] = "Информация об общежитии временно недоступна."
+            
     return dorm_info
 
 
