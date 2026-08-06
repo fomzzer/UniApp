@@ -12,11 +12,12 @@ int main(int argc, char *argv[])
     LoginWindow *logWin = new LoginWindow();
     DashboardWindow *dashWin = new DashboardWindow();
 
-    QObject::connect(logWin, &LoginWindow::loginSuccessful, [=](const QString &userName, const QStringList &userInfo, const QJsonArray &gradesInfo) {
+    QObject::connect(logWin, &LoginWindow::loginSuccessful, [=](const QString &userName, const QStringList &userInfo, const QJsonArray &gradesInfo, const QString &dormStatus) {
         dashWin->clearDashboardWindow();
         dashWin->setUserName(userName);
         dashWin->setUserInfo(userInfo);
         dashWin->setUserGrades(gradesInfo);
+        dashWin->setDormitoryInfo(dormStatus);
         logWin->hide();
         dashWin->show();
     });

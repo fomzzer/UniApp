@@ -96,6 +96,19 @@ def parse_grades(soup):
     return grades_list
 
 
+def parse_dormitory(soup):
+    dorm_info = {}
+    
+    red_text = soup.find('font', color='red')
+    if red_text:
+        dorm_info["status"] = red_text.get_text(strip=True)
+    else:
+        body_text = soup.get_text(separator=' ', strip=True)
+        dorm_info["status"] = "Информация получена, но формат требует уточнения."
+        
+    return dorm_info
+
+
 @app.post("/api/login")
 def get_info(credentials: LoginData):
     url = "https://e-university.tu-sofia.bg/ETUS/studenti/"
@@ -190,11 +203,23 @@ def get_info(credentials: LoginData):
                 
                 student_grades = parse_grades(grades_soup)
 
+                student_dorm = {}
+                try:
+                    form_data['deistvie'] = '7'
+                    dorm_response = session.post(action_url, headers=headers, data=form_data, timeout=10)
+                    dorm_response.encoding = 'utf-8'
+                    dorm_soup = BeautifulSoup(dorm_response.text, 'lxml')
+                    student_dorm = parse_dormitory(dorm_soup)
+                except Exception as e:
+                    logger.error(f"Failed to fetch dormitory info: {e}")
+                    student_dorm = {"status": "Ошибка загрузки данных об общежитии"}
+
                 return {
                     'status': 'success',
                     'name': full_name,
                     'info': all_info,
-                    'grades': student_grades
+                    'grades': student_grades,
+                    'dormitory': student_dorm
                 }
             
             if is_2fa:

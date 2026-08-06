@@ -101,8 +101,11 @@ void LoginWindow::onServerResponse(QNetworkReply* reply) {
 
     ui->pushButton->setText("Получаем данные...");
 
-    if (replyJson.contains("status") && replyJson["status"].toString() == "success" && replyJson.contains("grades")) {
+    if (replyJson.contains("status") && replyJson["status"].toString() == "success" && replyJson.contains("grades") && replyJson.contains("dormitory")) {
         QJsonArray gradesInfo = replyJson["grades"].toArray();
+
+        QJsonObject dormObj = replyJson["dormitory"].toObject();
+        QString dormStatus = dormObj["status"].toString();
 
         ui->pushButton->setText("Войти");
         QString userName = replyJson["name"].toString();
@@ -132,7 +135,7 @@ void LoginWindow::onServerResponse(QNetworkReply* reply) {
             settings.remove("password");
         }
 
-        emit loginSuccessful(userName, userInfo, gradesInfo);
+        emit loginSuccessful(userName, userInfo, gradesInfo, dormStatus);
     }
     else {
         ui->pushButton->setText("Войти");

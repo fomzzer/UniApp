@@ -403,6 +403,10 @@ void DashboardWindow::setUserGrades(const QJsonArray &gradesInfo) {
     }
 }
 
+void DashboardWindow::setDormitoryInfo(const QString &dormStatus) {
+    ui->label_8->setText(dormStatus);
+}
+
 QString DashboardWindow::getAcronym(const QString fullWord) {
     QStringList words = fullWord.split(' ', Qt::SkipEmptyParts);
     QString acronym = "";
@@ -431,4 +435,5 @@ void DashboardWindow::clearDashboardWindow() {
     ui->lbl_stream->setText("Поток:");
     ui->lbl_semester->setText("Семестр:");
     ui->lbl_course->setText("Курс:");
+    ui->stackedWidget->setCurrentIndex(0);
 }

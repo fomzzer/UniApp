@@ -22,6 +22,7 @@ public:
     void setUserName(const QString &name);
     void setUserInfo(const QStringList &info);
     void setUserGrades(const QJsonArray &gradesInfo);
+    void setDormitoryInfo(const QString &dormStatus);
     void clearDashboardWindow();
 
 signals:
