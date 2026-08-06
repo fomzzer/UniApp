@@ -21,48 +21,34 @@ class LoginData(BaseModel):
 def parse_grades(soup):
     grades_list = []
     
-    header_cell = soup.find(lambda tag: tag.name in ['td', 'th'] and 'дисциплина' in tag.get_text().lower())
-    
-    if not header_cell:
-        logger.error("Ячейка 'Дисциплина' не найдена! Возможно, страница пустая.")
-        logger.error(f"Сырой текст страницы (первые 1000 символов):\n{soup.get_text(strip=True)[:1000]}")
+    grades_table = None
+    for tbl in soup.find_all('table'):
+        text = tbl.get_text().lower()
+        if "дисциплина" in text and "лекции" in text:
+            grades_table = tbl
+            break
+            
+    if not grades_table:
+        logger.error("РАДАР: Таблица с оценками (Дисциплина + Лекции) не найдена на странице!")
         return []
         
-    grades_table = header_cell.find_parent('table')
-    
-    if not grades_table:
-        logger.error("Таблица вокруг ячейки не найдена.")
-        return []
-
-    found_header = False
-    for tr in grades_table.find_all('tr'):
+    for tr in grades_table.find_all('tr')[1:]:
         tds = tr.find_all('td')
         if not tds:
             continue
             
-        row_text = tr.get_text(strip=True).lower()
-        
-        if "дисциплина" in row_text:
-            found_header = True
-            continue
-            
-        if not found_header:
-            continue
-            
         first_td = tds[0]
-        b_tag = first_td.find('b')
-        
-        if not b_tag:
-            continue
-            
-        subject_name = b_tag.get_text(strip=True)
         full_text = first_td.get_text(separator=' ', strip=True)
         
-        text_after_subject = full_text.replace(subject_name, '', 1).strip()
-        type_match = re.search(r'^\((.*?)\)', text_after_subject)
+        if "(" not in full_text and "зачита се" not in full_text.lower():
+            continue
+            
+        subject_name = full_text.split('(')[0].strip()
+        if not subject_name:
+            continue
+            
+        type_match = re.search(r'\((.*?)\)', full_text)
         control_type = type_match.group(1).strip() if type_match else ""
-        
-        grade_matches = re.findall(r'([А-Яа-я\.\s]+\(\d\))\s*\((редовна|поправителна)\)', full_text)
         
         regular_grade = "-"
         retake_grade = "-"
@@ -71,25 +57,29 @@ def parse_grades(soup):
         if "зачита се" in full_text.lower():
             regular_grade = "Зачита се"
             final_grade = "Зачита се"
+        else:
+            grade_matches = re.findall(r'([^,:]+?\(\d\))\s*\((редовна|поправителна)\)', full_text, re.IGNORECASE)
+            for grade_val, try_type in grade_matches:
+                grade_val = grade_val.strip()
+                if try_type.lower() == 'редовна':
+                    regular_grade = grade_val
+                    final_grade = grade_val
+                elif try_type.lower() == 'поправителна':
+                    retake_grade = grade_val
+                    final_grade = grade_val
+                    
+        if control_type or final_grade != "-":
+            grades_list.append({
+                "subject": subject_name,
+                "type": control_type,
+                "regular": regular_grade,
+                "retake": retake_grade,
+                "final": final_grade
+            })
             
-        for grade_val, try_type in grade_matches:
-            grade_val = grade_val.strip()
-            grade_val = re.sub(r'[,:;]+$', '', grade_val).strip()
-            
-            if try_type.lower() == 'редовна':
-                regular_grade = grade_val
-                final_grade = grade_val
-            elif try_type.lower() == 'поправителна':
-                retake_grade = grade_val
-                final_grade = grade_val
-                
-        grades_list.append({
-            "subject": subject_name,
-            "type": control_type,
-            "regular": regular_grade,
-            "retake": retake_grade,
-            "final": final_grade
-        })
+    if not grades_list:
+        logger.error("РАДАР: Таблица найдена, но парсер не смог извлечь ни одной оценки! Структура HTML:")
+        logger.error(grades_table.prettify()[:2000])
         
     return grades_list
 
@@ -164,14 +154,12 @@ def get_info(credentials: LoginData):
                 
                 student_grades = []
                 form_data = {}
-                
                 nav_form = soup.find('form', attrs={'name': 'nav'})
                 action_url = url
                 
                 if nav_form:
                     if nav_form.get('action'):
                         action_url = urljoin(url, nav_form.get('action'))
-                        
                     for inp in nav_form.find_all('input'):
                         name = inp.get('name') or inp.get('id')
                         if name:
@@ -183,7 +171,7 @@ def get_info(credentials: LoginData):
                             form_data[name] = inp.get('value', '')
 
                 form_data['deistvie'] = '1'
-
+                
                 grades_response = session.post(action_url, headers=headers, data=form_data, timeout=10)
                 grades_response.encoding = 'utf-8'
                 grades_soup = BeautifulSoup(grades_response.text, 'lxml')
