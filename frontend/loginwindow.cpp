@@ -8,12 +8,15 @@
 #include <QRegularExpressionValidator>
 #include <QKeyEvent>
 #include <QSettings>
+#include <QIcon>
 
 LoginWindow::LoginWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::LoginWindow)
 {
     ui->setupUi(this);
+
+    this->setWindowIcon(QIcon("://assets/logodesc.png"));
 
     QSettings settings;
 
