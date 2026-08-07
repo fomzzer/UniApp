@@ -8,8 +8,12 @@ import ddddocr
 import re
 from urllib.parse import urljoin
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
+logger = logging.getLogger("tu_sofia_scraper")
 
 app = FastAPI()
 ocr = ddddocr.DdddOcr(show_ad=False)
@@ -29,7 +33,7 @@ def parse_grades(soup):
             break
             
     if not grades_table:
-        logger.warning("Target grades table ('дисциплина', 'лекции') not found in the DOM.")
+        logger.warning("Target grades table not found in the DOM.")
         return []
         
     for tr in grades_table.find_all('tr')[1:]:
@@ -90,11 +94,9 @@ def parse_grades(soup):
             })
             
     if not grades_list:
-        logger.error("Grades table identified, but record extraction yielded no results. DOM snapshot follows:")
-        logger.error(grades_table.prettify()[:2000])
+        logger.error("Grades table identified, but record extraction yielded no results.")
         
     return grades_list
-
 
 def parse_dormitory(soup):
     dorm_info = {}
@@ -129,36 +131,42 @@ def parse_dormitory(soup):
     dorm_info["status"] = message
     return dorm_info
 
-
 @app.post("/api/login")
 def get_info(credentials: LoginData):
     url = "https://e-university.tu-sofia.bg/ETUS/studenti/"
-    headers = {"User-Agent": "Mozilla/5.0"}
+    captcha_url = "https://e-university.tu-sofia.bg/ETUS/studenti/captcha.php"
+    
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Language": "bg-BG,bg;q=0.9,en-US;q=0.8,en;q=0.7",
+        "Referer": "https://e-university.tu-sofia.bg/ETUS/studenti/",
+        "Origin": "https://e-university.tu-sofia.bg",
+        "Connection": "keep-alive"
+    }
 
     is_2fa = len(credentials.auth_code) == 6 and credentials.auth_code.isdigit()
-    max_attempts = 1 if is_2fa else 10 
-
-    session = requests.Session()
+    max_attempts = 1 if is_2fa else 7
 
     try:
         for attempt in range(max_attempts):
+            session = requests.Session()
             session.get(url, headers=headers, timeout=10)
 
             captcha_text = ""
             
             if not is_2fa:
-                captcha_url = "https://e-university.tu-sofia.bg/ETUS/studenti/captcha.php"
-                captcha_response = session.get(captcha_url, headers=headers, timeout=10)
-                
-                if captcha_response.status_code == 200:
-                    raw_captcha = ocr.classification(captcha_response.content)
-                    captcha_text = raw_captcha.strip().upper()
-                    
-                    replacements = {'0':'O', '1':'I', '2':'Z', '3':'E', '4':'A', '5':'S', '6':'G', '7':'T', '8':'B', '9':'G'}
-                    for digit, letter in replacements.items():
-                        captcha_text = captcha_text.replace(digit, letter)
+                for _ in range(5):
+                    captcha_response = session.get(captcha_url, headers=headers, timeout=10)
+                    if captcha_response.status_code == 200:
+                        raw_captcha = ocr.classification(captcha_response.content)
+                        captcha_text = re.sub(r'[^A-Za-z0-9]', '', raw_captcha).upper()
                         
-                    logger.info(f"Authentication attempt {attempt + 1}: CAPTCHA resolved as '{captcha_text}'.")
+                        if len(captcha_text) == 6:
+                            break 
+                        time.sleep(0.2)
+                        
+                logger.info(f"Authentication attempt {attempt + 1}: Dispatching CAPTCHA resolution '{captcha_text}'")
 
             data = {
                 'fnum': credentials.faculty_no,
@@ -177,6 +185,8 @@ def get_info(credentials: LoginData):
             logout_btn = soup.find('input', id='izh')
 
             if logout_btn:
+                logger.info("Authentication successful. Proceeding with data extraction.")
+                
                 full_name = logout_btn.parent.get_text(strip=True)
                 all_info = {}
                 info_table = soup.find('table', id='info')
@@ -184,17 +194,13 @@ def get_info(credentials: LoginData):
                 if info_table:
                     for row in info_table.find_all('tr'):
                         cells = row.find_all('td')
-
                         for i in range(0, len(cells) - 1, 2):
                             key_element = cells[i]
                             val_element = cells[i+1]
-
                             key_strings = list(key_element.stripped_strings)
                             key = key_strings[0].replace('\xa0', ' ').replace('"', '').strip().rstrip(':').strip() if key_strings else ""
-
                             val_strings = list(val_element.stripped_strings)
                             val = val_strings[0].replace('"', '').strip() if val_strings else ""
-
                             if key:
                                 all_info[key] = val
                 
@@ -221,7 +227,6 @@ def get_info(credentials: LoginData):
                 grades_response = session.post(action_url, headers=headers, data=form_data, timeout=10)
                 grades_response.encoding = 'utf-8'
                 grades_soup = BeautifulSoup(grades_response.text, 'lxml')
-                
                 student_grades = parse_grades(grades_soup)
 
                 student_dorm = {}
@@ -232,7 +237,7 @@ def get_info(credentials: LoginData):
                     dorm_soup = BeautifulSoup(dorm_response.text, 'lxml')
                     student_dorm = parse_dormitory(dorm_soup)
                 except Exception as e:
-                    logger.error(f"Failed to fetch dormitory info: {e}")
+                    logger.error(f"Dormitory data extraction failed: {e}")
                     student_dorm = {"status": "Ошибка загрузки данных об общежитии"}
 
                 return {
@@ -243,34 +248,39 @@ def get_info(credentials: LoginData):
                     'dormitory': student_dorm
                 }
             
-            if is_2fa:
-                break
+            error_msg_tag = soup.find(lambda tag: tag.name in ['font', 'div', 'p'] and any(w in tag.get_text().lower() for w in ['грешна', 'невалиден', 'грешен', 'error', 'опита', 'отказан']))
+            server_reason = error_msg_tag.get_text(strip=True) if error_msg_tag else "Unknown server error or malformed response"
             
-            logger.warning("Authentication unsuccessful. Retrying with a new CAPTCHA challenge...")
+            if "Достъпът ще Ви бъде отказан" in server_reason or "грешни опита" in server_reason:
+                logger.error(f"Access denied by remote firewall rate limiting. Server threshold reached. Reason: {server_reason}")
+                return {'status': 'error', 'message': f"Account temporarily restricted. {server_reason}"}
+            
+            if is_2fa:
+                logger.warning(f"2FA authentication failed. Server output: {server_reason}")
+                break 
+            
+            logger.warning(f"Authentication attempt {attempt + 1} failed. Server output: '{server_reason}'")
             time.sleep(0.5)
 
         return {'status': 'error', 'message': "Invalid credentials or CAPTCHA"}
 
     except Exception as e:
-        logger.error(f"Session request failed due to exception: {e}")
+        logger.error(f"Session execution aborted due to unexpected exception: {e}")
         return {'status': 'error', 'message': f"Server connection error: {str(e)}"}
-
 
 @app.get("/api/schedules")
 def get_schedule():
     try:
         url = "https://tu-sofia.bg/university/weeklyprograms"
-        headers = {"User-Agent": "Mozilla/5.0"}
-
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
         all_schedules = []
 
         for faculty_id in range(1, 35):
-            form_data = {
-                "Faculty[id]": str(faculty_id)
-            }
-
+            form_data = {"Faculty[id]": str(faculty_id)}
             try:
-                response = requests.post(url, headers=headers, data=form_data)
+                response = requests.post(url, headers=headers, data=form_data, timeout=10)
                 if response.status_code != 200:
                     continue
                 
@@ -285,9 +295,7 @@ def get_schedule():
                 for i, table in enumerate(valid_tables):
                     if "Няма намерени резултати" in table.text:
                         continue
-
                     rows = table.find_all('tr')[1:]
-
                     for row in rows:
                         cols = row.find_all('td')
                         if len(cols) >= 7:
@@ -309,7 +317,6 @@ def get_schedule():
                                     "stream": stream,
                                     "url": pdf_url
                                 })
-
                 time.sleep(0.5)
 
             except Exception as e:
@@ -318,4 +325,5 @@ def get_schedule():
 
         return all_schedules
     except Exception as e:
+        logger.error(f"Critical failure in schedule endpoint: {e}")
         raise HTTPException(status_code=500, detail=str(e))
