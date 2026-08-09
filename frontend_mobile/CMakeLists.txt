@@ -4,7 +4,7 @@ project(uniapp_mobile VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick Network QuickControls2)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick Network QuickControls2 Pdf PdfQuick)
 
 qt_standard_project_setup(REQUIRES 6.10)
 
@@ -38,7 +38,7 @@ set_target_properties(appuniapp_mobile PROPERTIES
 )
 
 target_link_libraries(appuniapp_mobile
-    PRIVATE Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick Qt6::Network Qt6::QuickControls2
+    PRIVATE Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick Qt6::Network Qt6::QuickControls2 Qt6::Pdf Qt6::PdfQuick
 )
 
 install(TARGETS appuniapp_mobile

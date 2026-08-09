@@ -5,20 +5,29 @@
 #include <QUrl>
 
 AuthManager::AuthManager(QObject *parent)
-    : QObject(parent), m_isLoading(false)
+    : QObject(parent), m_isLoading(false), m_isScheduleLoading(false)
 {
     networkManager = new QNetworkAccessManager(this);
     connect(networkManager, &QNetworkAccessManager::finished, this, &AuthManager::onServerResponse);
+
+    scheduleNetworkManager = new QNetworkAccessManager(this);
+    connect(scheduleNetworkManager, &QNetworkAccessManager::finished, this, &AuthManager::onScheduleResponse);
 }
 
-bool AuthManager::isLoading() const {
-    return m_isLoading;
-}
+bool AuthManager::isLoading() const { return m_isLoading; }
+bool AuthManager::isScheduleLoading() const { return m_isScheduleLoading; }
 
 void AuthManager::setLoading(bool loading) {
     if (m_isLoading != loading) {
         m_isLoading = loading;
         emit isLoadingChanged();
+    }
+}
+
+void AuthManager::setScheduleLoading(bool loading) {
+    if (m_isScheduleLoading != loading) {
+        m_isScheduleLoading = loading;
+        emit isScheduleLoadingChanged();
     }
 }
 
@@ -69,6 +78,48 @@ void AuthManager::onServerResponse(QNetworkReply* reply) {
     }
     else {
         emit loginError("Ошибка получения данных. Проверьте учетные данные или повторите попытку.");
+    }
+
+    reply->deleteLater();
+}
+
+void AuthManager::fetchSchedule(const QString &faculty, const QString &specialty, const QString &course, const QString &group) {
+    setScheduleLoading(true);
+
+    QUrl url("http://20.215.255.122:8000/api/schedule");
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QJsonObject json;
+    json["faculty"] = faculty;
+    json["specialty"] = specialty;
+    json["course"] = course;
+    json["group"] = group;
+
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson();
+
+    scheduleNetworkManager->post(request, data);
+}
+
+void AuthManager::onScheduleResponse(QNetworkReply* reply) {
+    setScheduleLoading(false);
+
+    if (reply->error() != QNetworkReply::NoError) {
+        emit scheduleError("Ошибка сети: " + reply->errorString());
+        reply->deleteLater();
+        return;
+    }
+
+    QByteArray responseData = reply->readAll();
+    QJsonDocument replyDoc = QJsonDocument::fromJson(responseData);
+    QJsonObject replyJson = replyDoc.object();
+
+    if (replyJson.contains("status") && replyJson["status"].toString() == "success") {
+        QString pdfUrl = replyJson["url"].toString();
+        emit scheduleUrlReceived(pdfUrl);
+    } else {
+        emit scheduleError("Расписание для выбранных параметров не найдено");
     }
 
     reply->deleteLater();
