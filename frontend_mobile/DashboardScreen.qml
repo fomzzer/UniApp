@@ -12,23 +12,297 @@ Page {
     property var studentInfo: ({})
     property var gradesData: []
     property string dormInfo: ""
+
+    property var allSchedules: []
     property string currentPdfUrl: ""
+    property string scheduleErrorMsg: ""
+    property bool hasScheduleError: false
 
     Connections {
         target: AuthManager
-        function onScheduleUrlReceived(pdfUrl) {
-            dashboardPage.currentPdfUrl = pdfUrl;
+        function onAllSchedulesReceived(schedulesArray) {
+            dashboardPage.allSchedules = schedulesArray;
+            dashboardPage.updateFaculties();
+            dashboardPage.updateSpecialties();
+            dashboardPage.updateCourses();
+            dashboardPage.updateStreams();
+
+            dashboardPage.autoSelectSchedule();
+        }
+        function onPdfDownloaded(localPath) {
+            console.log("PDF успешно скачан! Путь:", localPath);
+            dashboardPage.currentPdfUrl = localPath;
+            dashboardPage.hasScheduleError = false;
+
+            Qt.callLater(function() {
+                scheduleFlickable.contentY = Math.max(0, scheduleFlickable.contentHeight - scheduleFlickable.height);
+            });
         }
         function onScheduleError(errorMessage) {
+            console.error("Ошибка от C++ сервера:", errorMessage);
             dashboardPage.currentPdfUrl = "";
-            scheduleStatusLabel.text = errorMessage;
-            scheduleStatusLabel.color = "#ef4444";
+            dashboardPage.scheduleErrorMsg = errorMessage;
+            dashboardPage.hasScheduleError = true;
         }
+    }
+
+    Component.onCompleted: {
+        AuthManager.fetchAllSchedules();
     }
 
     PdfDocument {
         id: schedulePdf
         source: dashboardPage.currentPdfUrl
+    }
+
+    function getAcronym(text) {
+        if (!text) return "";
+        let cleanText = text.toString().replace(/-/g, ' ');
+        let words = cleanText.split(/\s+/);
+        let acronym = "";
+        let skipWords = ["по", "и", "на", "за", "в", "с"];
+        for (let i = 0; i < words.length; i++) {
+            let word = words[i].trim().toLowerCase();
+            if (word.length > 0 && skipWords.indexOf(word) === -1) {
+                acronym += words[i].charAt(0).toUpperCase();
+            }
+        }
+        return acronym;
+    }
+
+    function autoSelectSchedule() {
+        if (!studentInfo || Object.keys(studentInfo).length === 0 || !allSchedules || allSchedules.length === 0) return;
+
+        let sFac = studentInfo["Факултет"] || "";
+        let sSpec = studentInfo["Специалност"] || "";
+        let sCourse = getCourse(studentInfo["Записан семестър"]).toString();
+        let sStream = studentInfo["Поток"] || "";
+
+        if (sFac === "" || sSpec === "" || sCourse === "-" || sStream === "") return;
+
+        let facAcronym = getAcronym(sFac);
+        let specAcronym = getAcronym(sSpec);
+
+        let bestMatch = null;
+        for (let i = 0; i < allSchedules.length; i++) {
+            let item = allSchedules[i];
+            let itemFac = item.faculty.toString().trim();
+            let itemSpec = item.speciality.toString().trim();
+            let itemCourse = item.course.toString().trim();
+            let itemStream = item.stream.toString().trim();
+
+            let facMatch = (itemFac.toLowerCase() === sFac.toLowerCase() || itemFac === facAcronym);
+            let specMatch = (itemSpec.toLowerCase() === sSpec.toLowerCase() || itemSpec === specAcronym);
+            let courseMatch = (itemCourse === sCourse);
+            let streamMatch = (itemStream === sStream || itemStream.indexOf(sStream) !== -1);
+
+            if (facMatch && specMatch && courseMatch && streamMatch) {
+                bestMatch = item;
+                break;
+            }
+        }
+
+        if (bestMatch) {
+            console.log("Автоподбор: точное совпадение найдено: ", bestMatch.url);
+
+            let facIdx = comboFac.find(bestMatch.faculty);
+            if (facIdx !== -1) {
+                comboFac.currentIndex = facIdx;
+
+                let specIdx = comboSpec.find(bestMatch.speciality);
+                if (specIdx !== -1) {
+                    comboSpec.currentIndex = specIdx;
+
+                    let courseIdx = comboCourse.find(bestMatch.course);
+                    if (courseIdx !== -1) {
+                        comboCourse.currentIndex = courseIdx;
+
+                        let streamIdx = comboStream.find(bestMatch.stream);
+                        if (streamIdx !== -1) {
+                            comboStream.currentIndex = streamIdx;
+
+                            dashboardPage.hasScheduleError = false;
+                            AuthManager.downloadPdf(bestMatch.url);
+                        }
+                    }
+                }
+            }
+        } else {
+            console.log("Автоподбор: расписание не найдено для", facAcronym, specAcronym, sCourse, sStream);
+        }
+    }
+
+    Popup {
+        id: pdfFullScreenPopup
+        parent: Overlay.overlay
+        width: dashboardPage.width
+        height: dashboardPage.height
+        x: 0; y: 0
+        padding: 0
+        background: Rectangle { color: "#E60D1117" }
+
+        onOpened: {
+            if (typeof fsPdfContainer !== "undefined" && typeof fsWrapper !== "undefined") {
+                fsPdfContainer.scale = 1.0;
+                Qt.callLater(function() {
+                    fsPdfContainer.x = (fsWrapper.width - fsPdfContainer.width) / 2;
+                    fsPdfContainer.y = (fsWrapper.height - fsPdfContainer.height) / 2;
+                });
+            }
+        }
+
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 0
+
+            Rectangle {
+                Layout.fillWidth: true
+                height: 60
+                color: "#161B22"
+                border.color: "#30363D"
+                border.width: 1
+
+                Label {
+                    text: "Расписание"
+                    color: "#FFFFFF"
+                    font.pixelSize: 18
+                    font.bold: true
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 20
+                }
+
+                Button {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    anchors.rightMargin: 10
+                    background: Rectangle { color: "transparent" }
+                    contentItem: Text {
+                        text: "✖ Закрыть"
+                        color: "#ef4444"
+                        font.pixelSize: 16
+                        font.bold: true
+                    }
+                    onClicked: pdfFullScreenPopup.close()
+                }
+            }
+
+            Rectangle {
+                id: fsWrapper
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                color: "transparent"
+                clip: true
+
+                Item {
+                    id: fsPdfContainer
+                    width: fsPdfView.width
+                    height: fsPdfView.height
+
+                    PdfPageView {
+                        id: fsPdfView
+                        document: schedulePdf
+                        enabled: false
+
+                        property real pdfW: (schedulePdf.status === PdfDocument.Ready && schedulePdf.pagePointSize(0).width > 0) ? schedulePdf.pagePointSize(0).width : 1000
+                        property real pdfH: (schedulePdf.status === PdfDocument.Ready && schedulePdf.pagePointSize(0).height > 0) ? schedulePdf.pagePointSize(0).height : 1000
+                        property real scaleW: fsWrapper.width / pdfW
+                        property real scaleH: fsWrapper.height / pdfH
+
+                        renderScale: Math.min(scaleW, scaleH) * 0.98
+                    }
+
+                    PinchHandler {
+                        target: fsPdfContainer
+                        minimumScale: 1.0
+                        maximumScale: 5.0
+                    }
+
+                    DragHandler {
+                        target: fsPdfContainer
+                    }
+                }
+            }
+        }
+    }
+
+    function updateFaculties() {
+        if (allSchedules.length === 0) return;
+        let facs = ["Выберите факультет"];
+        for (let i = 0; i < allSchedules.length; i++) {
+            let f = allSchedules[i].faculty;
+            if (f && facs.indexOf(f) === -1) {
+                facs.push(f);
+            }
+        }
+        comboFac.model = facs;
+        comboFac.currentIndex = 0;
+
+        comboSpec.model = ["Выберите специальность"];
+        comboCourse.model = ["Выберите курс"];
+        comboStream.model = ["Выберите поток"];
+    }
+
+    function updateSpecialties() {
+        if (allSchedules.length === 0) return;
+        let currentFac = comboFac.currentText;
+        let specs = ["Выберите специальность"];
+
+        if (currentFac !== "Выберите факультет" && currentFac !== "Загрузка...") {
+            for (let i = 0; i < allSchedules.length; i++) {
+                if (allSchedules[i].faculty === currentFac) {
+                    let s = allSchedules[i].speciality;
+                    if (s && specs.indexOf(s) === -1) {
+                        specs.push(s);
+                    }
+                }
+            }
+        }
+        comboSpec.model = specs;
+        comboSpec.currentIndex = 0;
+    }
+
+    function updateCourses() {
+        if (allSchedules.length === 0) return;
+        let currentFac = comboFac.currentText;
+        let currentSpec = comboSpec.currentText;
+        let crs = ["Выберите курс"];
+
+        if (currentFac !== "Выберите факультет" && currentSpec !== "Выберите специальность" && currentFac !== "Загрузка...") {
+            for (let i = 0; i < allSchedules.length; i++) {
+                if (allSchedules[i].faculty === currentFac && allSchedules[i].speciality === currentSpec) {
+                    let c = allSchedules[i].course;
+                    if (c && crs.indexOf(c) === -1) {
+                        crs.push(c);
+                    }
+                }
+            }
+        }
+        comboCourse.model = crs;
+        comboCourse.currentIndex = 0;
+    }
+
+    function updateStreams() {
+        if (allSchedules.length === 0) return;
+        let currentFac = comboFac.currentText;
+        let currentSpec = comboSpec.currentText;
+        let currentCourse = comboCourse.currentText;
+        let strms = ["Выберите поток"];
+
+        if (currentFac !== "Выберите факультет" && currentSpec !== "Выберите специальность" && currentCourse !== "Выберите курс" && currentFac !== "Загрузка...") {
+            for (let i = 0; i < allSchedules.length; i++) {
+                if (allSchedules[i].faculty === currentFac &&
+                    allSchedules[i].speciality === currentSpec &&
+                    allSchedules[i].course === currentCourse) {
+                    let st = allSchedules[i].stream;
+                    if (st && strms.indexOf(st) === -1) {
+                        strms.push(st);
+                    }
+                }
+            }
+        }
+        comboStream.model = strms;
+        comboStream.currentIndex = 0;
     }
 
     function getCourse(semesterStr) {
@@ -143,35 +417,6 @@ Page {
         return flatResult;
     }
 
-    function getAcronym(str) {
-        if (!str || str === "-") return "-";
-        let words = str.toString().trim().split(/[\s-]+/);
-        let acronym = "";
-        let stopWords = ["по", "и", "в", "на", "за", "с", "от"];
-        for (let i = 0; i < words.length; i++) {
-            let w = words[i].toLowerCase();
-            if (stopWords.indexOf(w) === -1 && w.length > 0) {
-                acronym += w.charAt(0).toUpperCase();
-            }
-        }
-        return acronym.length > 0 ? acronym : str;
-    }
-
-    function getUniqueList(defaultValue, defaultList) {
-        let val = (defaultValue !== undefined && defaultValue !== null) ? defaultValue.toString().trim() : "";
-        let list = [];
-        if (val !== "" && val !== "-") {
-            list.push(val);
-        }
-        for (let i = 0; i < defaultList.length; i++) {
-            if (defaultList[i] !== val) {
-                list.push(defaultList[i]);
-            }
-        }
-        if (list.length === 0) return defaultList;
-        return list;
-    }
-
     SwipeView {
         id: swipeView
         anchors.fill: parent
@@ -266,7 +511,7 @@ Page {
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Label { text: "Курс / Семестр"; color: "#8B949E"; font.pixelSize: 14; Layout.fillWidth: true }
-                                    Label { text: (studentInfo["Записан семестър"] ? getCourse(studentInfo["Записан семестър"]) + " курс, " + studentInfo["Записан семестър"] + " сем." : "-"); color: "#FFFFFF"; font.pixelSize: 14; font.bold: true; horizontalAlignment: Text.AlignRight }
+                                    Label { text: (studentInfo["Записан семестър"] ? dashboardPage.getCourse(studentInfo["Записан семестър"]) + " / " + studentInfo["Записан семестър"] : "-"); color: "#FFFFFF"; font.pixelSize: 14; font.bold: true; horizontalAlignment: Text.AlignRight }
                                 }
                                 RowLayout {
                                     Layout.fillWidth: true
@@ -513,266 +758,407 @@ Page {
             background: Rectangle { color: "transparent" }
             clip: true
 
-            ListView {
+            Flickable {
+                id: scheduleFlickable
                 anchors.fill: parent
+                contentHeight: scheduleLayout.implicitHeight + 40
                 clip: true
                 boundsBehavior: Flickable.StopAtBounds
-                model: 1
+                interactive: true
 
-                delegate: Item {
-                    width: parent.width
-                    height: scheduleLayout.implicitHeight + 40
+                Behavior on contentY { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
 
-                    ColumnLayout {
-                        id: scheduleLayout
-                        width: parent.width * 0.9
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: parent.top
-                        anchors.topMargin: 20
-                        spacing: 20
+                ColumnLayout {
+                    id: scheduleLayout
+                    width: parent.width * 0.9
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.top
+                    anchors.topMargin: 20
+                    spacing: 20
 
-                        Rectangle {
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: filterContent.implicitHeight + 40
-                            color: "#22272E"
-                            radius: 12
-                            border.color: "#373E47"
-                            border.width: 1
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: filterContent.implicitHeight + 40
+                        color: "#22272E"
+                        radius: 12
+                        border.color: "#373E47"
+                        border.width: 1
+
+                        ColumnLayout {
+                            id: filterContent
+                            anchors.centerIn: parent
+                            width: parent.width - 30
+                            spacing: 15
+
+                            Label {
+                                text: "Параметры расписания"
+                                color: "#FFFFFF"
+                                font.pixelSize: 18
+                                font.bold: true
+                                Layout.bottomMargin: 5
+                            }
 
                             ColumnLayout {
-                                id: filterContent
-                                anchors.centerIn: parent
-                                width: parent.width - 30
-                                spacing: 15
-
-                                Label {
-                                    text: "Параметры расписания"
-                                    color: "#FFFFFF"
-                                    font.pixelSize: 18
-                                    font.bold: true
-                                    Layout.bottomMargin: 5
-                                }
-
-                                ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 5
+                                Label { text: "Факультет"; color: "#8B949E"; font.pixelSize: 13 }
+                                ComboBox {
+                                    id: comboFac
                                     Layout.fillWidth: true
-                                    spacing: 5
-                                    Label { text: "Факультет"; color: "#8B949E"; font.pixelSize: 13 }
-                                    ComboBox {
-                                        id: comboFac
-                                        Layout.fillWidth: true
-                                        model: dashboardPage.getUniqueList(dashboardPage.getAcronym(studentInfo["Факултет"]), ["ФИТ", "ФКСТ", "ФЕЕ", "МФ", "ФТК", "ФА", "СФ"])
+                                    model: ["Загрузка..."]
 
-                                        background: Rectangle {
-                                            implicitHeight: 40; color: "#1C2128"; border.color: "#373E47"; border.width: 1; radius: 6
-                                        }
-                                        contentItem: Text {
-                                            text: parent.displayText; color: "#FFFFFF"; font.pixelSize: 14; verticalAlignment: Text.AlignVCenter; leftPadding: 10; elide: Text.ElideRight
-                                        }
-                                        delegate: ItemDelegate {
-                                            width: comboFac.width; height: 40
-                                            contentItem: Text { text: modelData; color: "#FFFFFF"; font.pixelSize: 14; verticalAlignment: Text.AlignVCenter; elide: Text.ElideRight }
-                                            background: Rectangle { color: parent.highlighted ? "#2D333B" : "transparent" }
-                                        }
-                                        popup: Popup {
-                                            y: comboFac.height - 1; width: comboFac.width; padding: 1
-                                            contentItem: ListView {
-                                                clip: true
-                                                implicitHeight: contentHeight
-                                                model: comboFac.popup.visible ? comboFac.delegateModel : null
-                                                currentIndex: comboFac.highlightedIndex
-                                            }
-                                            background: Rectangle { color: "#1C2128"; border.color: "#373E47"; border.width: 1; radius: 6 }
+                                    onCurrentTextChanged: {
+                                        if (currentText !== "" && currentText !== "Загрузка..." && currentText !== "Выберите факультет") {
+                                            dashboardPage.updateSpecialties();
                                         }
                                     }
-                                }
-
-                                ColumnLayout {
-                                    Layout.fillWidth: true
-                                    spacing: 5
-                                    Label { text: "Специальность"; color: "#8B949E"; font.pixelSize: 13 }
-                                    ComboBox {
-                                        id: comboSpec
-                                        Layout.fillWidth: true
-                                        model: dashboardPage.getUniqueList(dashboardPage.getAcronym(studentInfo["Специалност"]), ["ИСИИ", "КСИ", "ИТ", "КСТ"])
-
-                                        background: Rectangle {
-                                            implicitHeight: 40; color: "#1C2128"; border.color: "#373E47"; border.width: 1; radius: 6
-                                        }
-                                        contentItem: Text {
-                                            text: parent.displayText; color: "#FFFFFF"; font.pixelSize: 14; verticalAlignment: Text.AlignVCenter; leftPadding: 10; elide: Text.ElideRight
-                                        }
-                                        delegate: ItemDelegate {
-                                            width: comboSpec.width; height: 40
-                                            contentItem: Text { text: modelData; color: "#FFFFFF"; font.pixelSize: 14; verticalAlignment: Text.AlignVCenter; elide: Text.ElideRight }
-                                            background: Rectangle { color: parent.highlighted ? "#2D333B" : "transparent" }
-                                        }
-                                        popup: Popup {
-                                            y: comboSpec.height - 1; width: comboSpec.width; padding: 1
-                                            contentItem: ListView {
-                                                clip: true
-                                                implicitHeight: contentHeight
-                                                model: comboSpec.popup.visible ? comboSpec.delegateModel : null
-                                                currentIndex: comboSpec.highlightedIndex
-                                            }
-                                            background: Rectangle { color: "#1C2128"; border.color: "#373E47"; border.width: 1; radius: 6 }
-                                        }
-                                    }
-                                }
-
-                                RowLayout {
-                                    Layout.fillWidth: true
-                                    spacing: 15
-
-                                    ColumnLayout {
-                                        Layout.fillWidth: true
-                                        spacing: 5
-                                        Label { text: "Курс"; color: "#8B949E"; font.pixelSize: 13 }
-                                        ComboBox {
-                                            id: comboCourse
-                                            Layout.fillWidth: true
-                                            model: dashboardPage.getUniqueList(dashboardPage.getCourse(studentInfo["Заверен семестър"]), ["1", "2", "3", "4"])
-
-                                            background: Rectangle {
-                                                implicitHeight: 40; color: "#1C2128"; border.color: "#373E47"; border.width: 1; radius: 6
-                                            }
-                                            contentItem: Text {
-                                                text: parent.displayText; color: "#FFFFFF"; font.pixelSize: 14; verticalAlignment: Text.AlignVCenter; leftPadding: 10
-                                            }
-                                            delegate: ItemDelegate {
-                                                width: comboCourse.width; height: 40
-                                                contentItem: Text { text: modelData; color: "#FFFFFF"; font.pixelSize: 14; verticalAlignment: Text.AlignVCenter }
-                                                background: Rectangle { color: parent.highlighted ? "#2D333B" : "transparent" }
-                                            }
-                                            popup: Popup {
-                                                y: comboCourse.height - 1; width: comboCourse.width; padding: 1
-                                                contentItem: ListView {
-                                                    clip: true
-                                                    implicitHeight: contentHeight
-                                                    model: comboCourse.popup.visible ? comboCourse.delegateModel : null
-                                                    currentIndex: comboCourse.highlightedIndex
-                                                }
-                                                background: Rectangle { color: "#1C2128"; border.color: "#373E47"; border.width: 1; radius: 6 }
-                                            }
-                                        }
-                                    }
-
-                                    ColumnLayout {
-                                        Layout.fillWidth: true
-                                        spacing: 5
-                                        Label { text: "Группа"; color: "#8B949E"; font.pixelSize: 13 }
-                                        ComboBox {
-                                            id: comboGroup
-                                            Layout.fillWidth: true
-                                            model: dashboardPage.getUniqueList(studentInfo["Група"], ["21", "22", "23", "24", "31", "32"])
-
-                                            background: Rectangle {
-                                                implicitHeight: 40; color: "#1C2128"; border.color: "#373E47"; border.width: 1; radius: 6
-                                            }
-                                            contentItem: Text {
-                                                text: parent.displayText; color: "#FFFFFF"; font.pixelSize: 14; verticalAlignment: Text.AlignVCenter; leftPadding: 10
-                                            }
-                                            delegate: ItemDelegate {
-                                                width: comboGroup.width; height: 40
-                                                contentItem: Text { text: modelData; color: "#FFFFFF"; font.pixelSize: 14; verticalAlignment: Text.AlignVCenter }
-                                                background: Rectangle { color: parent.highlighted ? "#2D333B" : "transparent" }
-                                            }
-                                            popup: Popup {
-                                                y: comboGroup.height - 1; width: comboGroup.width; padding: 1
-                                                contentItem: ListView {
-                                                    clip: true
-                                                    implicitHeight: contentHeight
-                                                    model: comboGroup.popup.visible ? comboGroup.delegateModel : null
-                                                    currentIndex: comboGroup.highlightedIndex
-                                                }
-                                                background: Rectangle { color: "#1C2128"; border.color: "#373E47"; border.width: 1; radius: 6 }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                Button {
-                                    text: AuthManager.isScheduleLoading ? "Загрузка..." : "Загрузить расписание"
-                                    enabled: !AuthManager.isScheduleLoading
-                                    Layout.fillWidth: true
-                                    Layout.topMargin: 10
-                                    Layout.preferredHeight: 45
 
                                     background: Rectangle {
-                                        color: parent.pressed ? "#1557B0" : (parent.enabled ? "#1F6FEB" : "#1b4f9e")
-                                        radius: 8
+                                        implicitHeight: 40; color: "#1C2128"; border.color: "#373E47"; border.width: 1; radius: 6
                                     }
-
                                     contentItem: Text {
-                                        text: parent.text
+                                        text: parent.displayText
                                         color: "#FFFFFF"
-                                        font.pixelSize: 15
-                                        font.bold: true
-                                        horizontalAlignment: Text.AlignHCenter
+                                        font.pixelSize: 13
                                         verticalAlignment: Text.AlignVCenter
+                                        leftPadding: 10
+                                        rightPadding: 30
+                                    }
+                                    delegate: ItemDelegate {
+                                        width: comboFac.width; height: 40
+                                        contentItem: Text {
+                                            text: modelData
+                                            color: "#FFFFFF"
+                                            font.pixelSize: 13
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+                                        background: Rectangle { color: parent.highlighted ? "#2D333B" : "transparent" }
+                                    }
+                                    popup: Popup {
+                                        y: comboFac.height - 1; width: comboFac.width; padding: 1
+                                        height: Math.min(contentItem.implicitHeight + 2, 250)
+                                        contentItem: ListView {
+                                            clip: true
+                                            implicitHeight: contentHeight
+                                            model: comboFac.popup.visible ? comboFac.delegateModel : null
+                                            currentIndex: comboFac.highlightedIndex
+                                            ScrollIndicator.vertical: ScrollIndicator { }
+                                        }
+                                        background: Rectangle { color: "#1C2128"; border.color: "#373E47"; border.width: 1; radius: 6 }
+                                    }
+                                }
+                            }
+
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 5
+                                Label { text: "Специальность"; color: "#8B949E"; font.pixelSize: 13 }
+                                ComboBox {
+                                    id: comboSpec
+                                    Layout.fillWidth: true
+                                    model: ["Загрузка..."]
+
+                                    onCurrentTextChanged: {
+                                        if (currentText !== "" && currentText !== "Загрузка..." && currentText !== "Выберите специальность") {
+                                            dashboardPage.updateCourses();
+                                        }
                                     }
 
-                                    onClicked: {
-                                        scheduleStatusLabel.text = "Расписание пока не загружено";
-                                        scheduleStatusLabel.color = "#8B949E";
-                                        dashboardPage.currentPdfUrl = "";
-                                        AuthManager.fetchSchedule(comboFac.currentText, comboSpec.currentText, comboCourse.currentText, comboGroup.currentText);
+                                    background: Rectangle {
+                                        implicitHeight: 40; color: "#1C2128"; border.color: "#373E47"; border.width: 1; radius: 6
+                                    }
+                                    contentItem: Text {
+                                        text: parent.displayText
+                                        color: "#FFFFFF"
+                                        font.pixelSize: 13
+                                        verticalAlignment: Text.AlignVCenter
+                                        leftPadding: 10
+                                        rightPadding: 30
+                                    }
+                                    delegate: ItemDelegate {
+                                        width: comboSpec.width; height: 40
+                                        contentItem: Text {
+                                            text: modelData
+                                            color: "#FFFFFF"
+                                            font.pixelSize: 13
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+                                        background: Rectangle { color: parent.highlighted ? "#2D333B" : "transparent" }
+                                    }
+                                    popup: Popup {
+                                        y: comboSpec.height - 1; width: comboSpec.width; padding: 1
+                                        height: Math.min(contentItem.implicitHeight + 2, 250)
+                                        contentItem: ListView {
+                                            clip: true
+                                            implicitHeight: contentHeight
+                                            model: comboSpec.popup.visible ? comboSpec.delegateModel : null
+                                            currentIndex: comboSpec.highlightedIndex
+                                            ScrollIndicator.vertical: ScrollIndicator { }
+                                        }
+                                        background: Rectangle { color: "#1C2128"; border.color: "#373E47"; border.width: 1; radius: 6 }
+                                    }
+                                }
+                            }
+
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: 15
+
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: 1
+                                    spacing: 5
+                                    Label { text: "Курс"; color: "#8B949E"; font.pixelSize: 13 }
+                                    ComboBox {
+                                        id: comboCourse
+                                        Layout.fillWidth: true
+                                        model: ["Загрузка..."]
+
+                                        onCurrentTextChanged: {
+                                            if (currentText !== "" && currentText !== "Загрузка..." && currentText !== "Выберите курс") {
+                                                dashboardPage.updateStreams();
+                                            }
+                                        }
+
+                                        background: Rectangle {
+                                            implicitHeight: 40; color: "#1C2128"; border.color: "#373E47"; border.width: 1; radius: 6
+                                        }
+                                        contentItem: Text {
+                                            text: parent.displayText
+                                            color: "#FFFFFF"
+                                            font.pixelSize: 13
+                                            verticalAlignment: Text.AlignVCenter
+                                            leftPadding: 10
+                                            rightPadding: 30
+                                        }
+                                        delegate: ItemDelegate {
+                                            width: comboCourse.width; height: 40
+                                            contentItem: Text {
+                                                text: modelData
+                                                color: "#FFFFFF"
+                                                font.pixelSize: 13
+                                                verticalAlignment: Text.AlignVCenter
+                                            }
+                                            background: Rectangle { color: parent.highlighted ? "#2D333B" : "transparent" }
+                                        }
+                                        popup: Popup {
+                                            y: comboCourse.height - 1; width: comboCourse.width; padding: 1
+                                            height: Math.min(contentItem.implicitHeight + 2, 250)
+                                            contentItem: ListView {
+                                                clip: true
+                                                implicitHeight: contentHeight
+                                                model: comboCourse.popup.visible ? comboCourse.delegateModel : null
+                                                currentIndex: comboCourse.highlightedIndex
+                                                ScrollIndicator.vertical: ScrollIndicator { }
+                                            }
+                                            background: Rectangle { color: "#1C2128"; border.color: "#373E47"; border.width: 1; radius: 6 }
+                                        }
+                                    }
+                                }
+
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: 1
+                                    spacing: 5
+                                    Label { text: "Поток"; color: "#8B949E"; font.pixelSize: 13 }
+                                    ComboBox {
+                                        id: comboStream
+                                        Layout.fillWidth: true
+                                        model: ["Загрузка..."]
+
+                                        background: Rectangle {
+                                            implicitHeight: 40; color: "#1C2128"; border.color: "#373E47"; border.width: 1; radius: 6
+                                        }
+                                        contentItem: Text {
+                                            text: parent.displayText
+                                            color: "#FFFFFF"
+                                            font.pixelSize: 13
+                                            verticalAlignment: Text.AlignVCenter
+                                            leftPadding: 10
+                                            rightPadding: 30
+                                        }
+                                        delegate: ItemDelegate {
+                                            width: comboStream.width; height: 40
+                                            contentItem: Text {
+                                                text: modelData
+                                                color: "#FFFFFF"
+                                                font.pixelSize: 13
+                                                verticalAlignment: Text.AlignVCenter
+                                            }
+                                            background: Rectangle { color: parent.highlighted ? "#2D333B" : "transparent" }
+                                        }
+                                        popup: Popup {
+                                            y: comboStream.height - 1; width: comboStream.width; padding: 1
+                                            height: Math.min(contentItem.implicitHeight + 2, 250)
+                                            contentItem: ListView {
+                                                clip: true
+                                                implicitHeight: contentHeight
+                                                model: comboStream.popup.visible ? comboStream.delegateModel : null
+                                                currentIndex: comboStream.highlightedIndex
+                                                ScrollIndicator.vertical: ScrollIndicator { }
+                                            }
+                                            background: Rectangle { color: "#1C2128"; border.color: "#373E47"; border.width: 1; radius: 6 }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Button {
+                                text: AuthManager.isScheduleLoading ? "Получение данных..." : "Загрузить расписание"
+                                enabled: !AuthManager.isScheduleLoading
+                                Layout.fillWidth: true
+                                Layout.topMargin: 10
+                                Layout.preferredHeight: 45
+
+                                background: Rectangle {
+                                    color: parent.pressed ? "#1557B0" : (parent.enabled ? "#1F6FEB" : "#1b4f9e")
+                                    radius: 8
+                                }
+
+                                contentItem: Text {
+                                    text: parent.text
+                                    color: "#FFFFFF"
+                                    font.pixelSize: 15
+                                    font.bold: true
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+
+                                onClicked: {
+                                    try {
+                                        let f = comboFac.currentText.toString().trim();
+                                        let s = comboSpec.currentText.toString().trim();
+                                        let c = comboCourse.currentText.toString().trim();
+                                        let st = comboStream.currentText.toString().trim();
+
+                                        if (f.indexOf("Выберите") !== -1 || s.indexOf("Выберите") !== -1 || c.indexOf("Выберите") !== -1 || st.indexOf("Выберите") !== -1 || f.indexOf("Загрузка") !== -1) {
+                                            dashboardPage.currentPdfUrl = "";
+                                            dashboardPage.scheduleErrorMsg = "Пожалуйста, выберите все параметры";
+                                            dashboardPage.hasScheduleError = true;
+                                            return;
+                                        }
+
+                                        let foundUrl = "";
+                                        for (let i = 0; i < dashboardPage.allSchedules.length; i++) {
+                                            let item = dashboardPage.allSchedules[i];
+                                            if (item.faculty.toString().trim() === f &&
+                                                item.speciality.toString().trim() === s &&
+                                                item.course.toString().trim() === c &&
+                                                item.stream.toString().trim() === st) {
+                                                foundUrl = item.url;
+                                                break;
+                                            }
+                                        }
+
+                                        if (foundUrl !== "") {
+                                            dashboardPage.hasScheduleError = false;
+                                            AuthManager.downloadPdf(foundUrl);
+                                        } else {
+                                            dashboardPage.currentPdfUrl = "";
+                                            dashboardPage.scheduleErrorMsg = "Расписание для выбранных параметров не найдено";
+                                            dashboardPage.hasScheduleError = true;
+                                        }
+                                    } catch(e) {
+                                        console.error("Ошибка при обработке клика:", e);
                                     }
                                 }
                             }
                         }
+                    }
 
-                        Rectangle {
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: dashboardPage.currentPdfUrl === "" ? 200 : 500
-                            color: dashboardPage.currentPdfUrl === "" ? "transparent" : "#22272E"
-                            radius: 12
-                            border.color: "#373E47"
-                            border.width: 1
-                            clip: true
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: dashboardPage.currentPdfUrl === "" ? 200 : 450
+                        color: dashboardPage.currentPdfUrl === "" ? "transparent" : "#22272E"
+                        radius: 12
+                        border.color: "#373E47"
+                        border.width: 1
+                        clip: true
 
-                            ColumnLayout {
-                                anchors.centerIn: parent
-                                spacing: 15
-                                visible: dashboardPage.currentPdfUrl === ""
+                        ColumnLayout {
+                            anchors.centerIn: parent
+                            width: Math.max(parent.width - 40, 100)
+                            spacing: 15
+                            visible: dashboardPage.currentPdfUrl === ""
 
-                                Rectangle {
-                                    Layout.alignment: Qt.AlignHCenter
-                                    width: 50; height: 50; radius: 10
-                                    color: "#22272E"
-                                    border.color: "#373E47"; border.width: 1
-                                    Label {
-                                        anchors.centerIn: parent
-                                        text: "📅"
-                                        font.pixelSize: 24
-                                    }
-                                }
-
+                            Rectangle {
+                                Layout.alignment: Qt.AlignHCenter
+                                width: 50; height: 50; radius: 10
+                                color: "#22272E"
+                                border.color: "#373E47"; border.width: 1
                                 Label {
-                                    id: scheduleStatusLabel
-                                    text: "Расписание пока не загружено"
-                                    color: "#8B949E"
-                                    font.pixelSize: 15
-                                    Layout.alignment: Qt.AlignHCenter
+                                    anchors.centerIn: parent
+                                    text: "📅"
+                                    font.pixelSize: 24
                                 }
                             }
 
-                            PdfMultiPageView {
-                                anchors.fill: parent
-                                anchors.margins: 4
-                                document: schedulePdf
-                                visible: dashboardPage.currentPdfUrl !== ""
+                            Label {
+                                text: dashboardPage.hasScheduleError ? dashboardPage.scheduleErrorMsg : "Расписание пока не загружено"
+                                color: dashboardPage.hasScheduleError ? "#ef4444" : "#8B949E"
+                                font.pixelSize: 14
+                                Layout.fillWidth: true
+                                wrapMode: Text.WordWrap
+                                horizontalAlignment: Text.AlignHCenter
+                            }
+                        }
 
-                                BusyIndicator {
-                                    anchors.centerIn: parent
-                                    running: schedulePdf.status === PdfDocument.Loading
-                                }
+                        Loader {
+                            anchors.fill: parent
+                            anchors.margins: 4
+                            active: dashboardPage.currentPdfUrl !== ""
+                            sourceComponent: Component {
+                                Item {
+                                    anchors.fill: parent
 
-                                Label {
-                                    anchors.centerIn: parent
-                                    text: "Ошибка при чтении PDF"
-                                    color: "#ef4444"
-                                    font.pixelSize: 15
-                                    visible: schedulePdf.status === PdfDocument.Error
+                                    PdfPageView {
+                                        id: previewView
+                                        document: schedulePdf
+                                        anchors.centerIn: parent
+                                        enabled: false
+
+                                        property real pdfW: (schedulePdf.status === PdfDocument.Ready && schedulePdf.pagePointSize(0).width > 0) ? schedulePdf.pagePointSize(0).width : 1000
+                                        property real pdfH: (schedulePdf.status === PdfDocument.Ready && schedulePdf.pagePointSize(0).height > 0) ? schedulePdf.pagePointSize(0).height : 1000
+                                        property real scaleW: parent.width / pdfW
+                                        property real scaleH: parent.height / pdfH
+
+                                        renderScale: Math.min(scaleW, scaleH) * 0.98
+                                    }
+
+                                    BusyIndicator {
+                                        anchors.centerIn: parent
+                                        running: schedulePdf.status === PdfDocument.Loading
+                                    }
+
+                                    Label {
+                                        anchors.centerIn: parent
+                                        text: "Ошибка при чтении PDF"
+                                        color: "#ef4444"
+                                        font.pixelSize: 15
+                                        visible: schedulePdf.status === PdfDocument.Error
+                                    }
+
+                                    Rectangle {
+                                        anchors.centerIn: parent
+                                        width: 60; height: 60
+                                        radius: 30
+                                        color: "#CC1C2128"
+                                        visible: schedulePdf.status === PdfDocument.Ready
+
+                                        Label {
+                                            anchors.centerIn: parent
+                                            anchors.verticalCenterOffset: -1
+                                            text: "⛶"
+                                            font.pixelSize: 26
+                                            color: "#58A6FF"
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: pdfFullScreenPopup.open()
+                                        }
+                                    }
                                 }
                             }
                         }

@@ -3,6 +3,8 @@
 #include <QJsonObject>
 #include <QNetworkRequest>
 #include <QUrl>
+#include <QFile>
+#include <QStandardPaths>
 
 AuthManager::AuthManager(QObject *parent)
     : QObject(parent), m_isLoading(false), m_isScheduleLoading(false)
@@ -12,6 +14,9 @@ AuthManager::AuthManager(QObject *parent)
 
     scheduleNetworkManager = new QNetworkAccessManager(this);
     connect(scheduleNetworkManager, &QNetworkAccessManager::finished, this, &AuthManager::onScheduleResponse);
+
+    pdfManager = new QNetworkAccessManager(this);
+    connect(pdfManager, &QNetworkAccessManager::finished, this, &AuthManager::onPdfResponse);
 }
 
 bool AuthManager::isLoading() const { return m_isLoading; }
@@ -36,7 +41,6 @@ void AuthManager::login(const QString &facultyNo, const QString &authCode) {
         emit loginError("Поля не заполнены");
         return;
     }
-
     setLoading(true);
 
     QUrl url("http://20.215.255.122:8000/api/login");
@@ -79,27 +83,14 @@ void AuthManager::onServerResponse(QNetworkReply* reply) {
     else {
         emit loginError("Ошибка получения данных. Проверьте учетные данные или повторите попытку.");
     }
-
     reply->deleteLater();
 }
 
-void AuthManager::fetchSchedule(const QString &faculty, const QString &specialty, const QString &course, const QString &group) {
+void AuthManager::fetchAllSchedules() {
     setScheduleLoading(true);
-
-    QUrl url("http://20.215.255.122:8000/api/schedule");
+    QUrl url("http://20.215.255.122:8000/api/schedules");
     QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-
-    QJsonObject json;
-    json["faculty"] = faculty;
-    json["specialty"] = specialty;
-    json["course"] = course;
-    json["group"] = group;
-
-    QJsonDocument doc(json);
-    QByteArray data = doc.toJson();
-
-    scheduleNetworkManager->post(request, data);
+    scheduleNetworkManager->get(request);
 }
 
 void AuthManager::onScheduleResponse(QNetworkReply* reply) {
@@ -112,14 +103,46 @@ void AuthManager::onScheduleResponse(QNetworkReply* reply) {
     }
 
     QByteArray responseData = reply->readAll();
-    QJsonDocument replyDoc = QJsonDocument::fromJson(responseData);
-    QJsonObject replyJson = replyDoc.object();
+    QJsonDocument doc = QJsonDocument::fromJson(responseData);
 
-    if (replyJson.contains("status") && replyJson["status"].toString() == "success") {
-        QString pdfUrl = replyJson["url"].toString();
-        emit scheduleUrlReceived(pdfUrl);
+    if (doc.isArray()) {
+        emit allSchedulesReceived(doc.array());
     } else {
-        emit scheduleError("Расписание для выбранных параметров не найдено");
+        emit scheduleError("Сервер вернул некорректный формат расписания");
+    }
+    reply->deleteLater();
+}
+
+void AuthManager::downloadPdf(const QString &urlStr) {
+    setScheduleLoading(true);
+    QUrl url(urlStr);
+    QNetworkRequest request(url);
+
+    request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+
+    pdfManager->get(request);
+}
+
+void AuthManager::onPdfResponse(QNetworkReply* reply) {
+    setScheduleLoading(false);
+
+    if (reply->error() != QNetworkReply::NoError) {
+        emit scheduleError("Ошибка загрузки файла: " + reply->errorString());
+        reply->deleteLater();
+        return;
+    }
+
+    QString tempPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/current_schedule.pdf";
+    QFile file(tempPath);
+
+    if (file.open(QIODevice::WriteOnly)) {
+        file.write(reply->readAll());
+        file.close();
+
+        QString safeUrl = QUrl::fromLocalFile(tempPath).toString();
+        emit pdfDownloaded(safeUrl);
+    } else {
+        emit scheduleError("Не удалось сохранить PDF на устройство");
     }
 
     reply->deleteLater();

@@ -20,7 +20,9 @@ public:
     bool isScheduleLoading() const;
 
     Q_INVOKABLE void login(const QString &facultyNo, const QString &authCode);
-    Q_INVOKABLE void fetchSchedule(const QString &faculty, const QString &specialty, const QString &course, const QString &group);
+    Q_INVOKABLE void fetchAllSchedules();
+
+    Q_INVOKABLE void downloadPdf(const QString &urlStr);
 
 signals:
     void isLoadingChanged();
@@ -29,16 +31,21 @@ signals:
     void loginSuccess(const QString &userName, const QJsonObject &userInfo, const QJsonArray &gradesInfo, const QString &dormStatus);
     void loginError(const QString &errorMessage);
 
-    void scheduleUrlReceived(const QString &pdfUrl);
+    void allSchedulesReceived(const QJsonArray &schedules);
     void scheduleError(const QString &errorMessage);
+
+    void pdfDownloaded(const QString &localPath);
 
 private slots:
     void onServerResponse(QNetworkReply* reply);
     void onScheduleResponse(QNetworkReply* reply);
+    void onPdfResponse(QNetworkReply* reply);
 
 private:
     QNetworkAccessManager *networkManager;
     QNetworkAccessManager *scheduleNetworkManager;
+    QNetworkAccessManager *pdfManager;
+
     bool m_isLoading;
     bool m_isScheduleLoading;
 
