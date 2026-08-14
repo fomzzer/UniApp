@@ -5,10 +5,16 @@
 #include <QUrl>
 #include <QFile>
 #include <QStandardPaths>
+#include <QSslConfiguration>
+#include <QSslSocket>
 
 AuthManager::AuthManager(QObject *parent)
     : QObject(parent), m_isLoading(false), m_isScheduleLoading(false)
 {
+    QSslConfiguration config = QSslConfiguration::defaultConfiguration();
+    config.setProtocol(QSsl::TlsV1_2);
+    QSslConfiguration::setDefaultConfiguration(config);
+
     networkManager = new QNetworkAccessManager(this);
     connect(networkManager, &QNetworkAccessManager::finished, this, &AuthManager::onServerResponse);
 

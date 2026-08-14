@@ -178,7 +178,7 @@ Page {
                     anchors.rightMargin: 10
                     background: Rectangle { color: "transparent" }
                     contentItem: Text {
-                        text: "✖ Закрыть"
+                        text: "Закрыть"
                         color: "#ef4444"
                         font.pixelSize: 16
                         font.bold: true
@@ -196,26 +196,35 @@ Page {
 
                 Item {
                     id: fsPdfContainer
-                    width: fsPdfView.width
-                    height: fsPdfView.height
+
+                    property real pdfW: (schedulePdf.status === PdfDocument.Ready && schedulePdf.pagePointSize(0).width > 0) ? schedulePdf.pagePointSize(0).width : 1000
+                    property real pdfH: (schedulePdf.status === PdfDocument.Ready && schedulePdf.pagePointSize(0).height > 0) ? schedulePdf.pagePointSize(0).height : 1000
+                    property real fitScale: (fsWrapper.width > 0 && fsWrapper.height > 0) ? Math.min(fsWrapper.width / pdfW, fsWrapper.height / pdfH) * 0.98 : 1.0
+
+                    width: pdfW * fitScale
+                    height: pdfH * fitScale
 
                     PdfPageView {
                         id: fsPdfView
                         document: schedulePdf
                         enabled: false
 
-                        property real pdfW: (schedulePdf.status === PdfDocument.Ready && schedulePdf.pagePointSize(0).width > 0) ? schedulePdf.pagePointSize(0).width : 1000
-                        property real pdfH: (schedulePdf.status === PdfDocument.Ready && schedulePdf.pagePointSize(0).height > 0) ? schedulePdf.pagePointSize(0).height : 1000
-                        property real scaleW: fsWrapper.width / pdfW
-                        property real scaleH: fsWrapper.height / pdfH
-
-                        renderScale: Math.min(scaleW, scaleH) * 0.98
+                        width: parent.width * 4.0
+                        height: parent.height * 4.0
+                        renderScale: parent.fitScale * 4.0
+                        scale: 0.25
+                        transformOrigin: Item.TopLeft
+                        x: 0
+                        y: 0
                     }
 
-                    PinchHandler {
-                        target: fsPdfContainer
-                        minimumScale: 1.0
-                        maximumScale: 5.0
+                    PinchArea {
+                        anchors.fill: parent
+                        pinch.target: fsPdfContainer
+                        pinch.minimumScale: 1.0
+                        pinch.maximumScale: 5.0
+                        pinch.minimumRotation: 0
+                        pinch.maximumRotation: 0
                     }
 
                     DragHandler {
@@ -1111,18 +1120,28 @@ Page {
                                 Item {
                                     anchors.fill: parent
 
-                                    PdfPageView {
-                                        id: previewView
-                                        document: schedulePdf
-                                        anchors.centerIn: parent
-                                        enabled: false
-
+                                    Item {
                                         property real pdfW: (schedulePdf.status === PdfDocument.Ready && schedulePdf.pagePointSize(0).width > 0) ? schedulePdf.pagePointSize(0).width : 1000
                                         property real pdfH: (schedulePdf.status === PdfDocument.Ready && schedulePdf.pagePointSize(0).height > 0) ? schedulePdf.pagePointSize(0).height : 1000
-                                        property real scaleW: parent.width / pdfW
-                                        property real scaleH: parent.height / pdfH
+                                        property real fitScale: (parent.width > 0 && parent.height > 0) ? Math.min(parent.width / pdfW, parent.height / pdfH) * 0.98 : 1.0
 
-                                        renderScale: Math.min(scaleW, scaleH) * 0.98
+                                        width: pdfW * fitScale
+                                        height: pdfH * fitScale
+                                        anchors.centerIn: parent
+
+                                        PdfPageView {
+                                            id: previewView
+                                            document: schedulePdf
+                                            enabled: false
+
+                                            width: parent.width * 4.0
+                                            height: parent.height * 4.0
+                                            renderScale: parent.fitScale * 4.0
+                                            scale: 0.25
+                                            transformOrigin: Item.TopLeft
+                                            x: 0
+                                            y: 0
+                                        }
                                     }
 
                                     BusyIndicator {
@@ -1140,23 +1159,32 @@ Page {
 
                                     Rectangle {
                                         anchors.centerIn: parent
-                                        width: 60; height: 60
-                                        radius: 30
+                                        width: 100; height: 40
+                                        radius: 20
                                         color: "#CC1C2128"
+                                        border.color: "#373E47"
+                                        border.width: 1
                                         visible: schedulePdf.status === PdfDocument.Ready
 
                                         Label {
                                             anchors.centerIn: parent
-                                            anchors.verticalCenterOffset: -1
-                                            text: "⛶"
-                                            font.pixelSize: 26
+                                            text: "Открыть"
+                                            font.pixelSize: 14
+                                            font.bold: true
                                             color: "#58A6FF"
                                         }
 
                                         MouseArea {
                                             anchors.fill: parent
                                             cursorShape: Qt.PointingHandCursor
-                                            onClicked: pdfFullScreenPopup.open()
+                                            onClicked: {
+                                                if (typeof fsPdfContainer !== "undefined" && typeof fsWrapper !== "undefined") {
+                                                    fsPdfContainer.scale = 1.0;
+                                                    fsPdfContainer.x = (fsWrapper.width - fsPdfContainer.width) / 2;
+                                                    fsPdfContainer.y = (fsWrapper.height - fsPdfContainer.height) / 2;
+                                                }
+                                                pdfFullScreenPopup.open();
+                                            }
                                         }
                                     }
                                 }

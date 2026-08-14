@@ -17,6 +17,9 @@ qt_add_executable(appuniapp_mobile
     main.cpp
 )
 
+set_target_properties(appuniapp_mobile PROPERTIES
+   QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
+
 qt_add_qml_module(appuniapp_mobile
     URI uniapp_mobile
     QML_FILES
@@ -46,3 +49,9 @@ install(TARGETS appuniapp_mobile
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+if (ANDROID)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/android_openssl/android_openssl.cmake)
+
+    add_android_openssl_libraries(appuniapp_mobile)
+endif()

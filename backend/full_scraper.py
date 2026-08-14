@@ -151,22 +151,22 @@ def get_info(credentials: LoginData):
     try:
         for attempt in range(max_attempts):
             session = requests.Session()
-            session.get(url, headers=headers, timeout=10)
+            session.get(url, headers=headers, timeout=30)
 
             captcha_text = ""
             
             if not is_2fa:
                 for _ in range(5):
-                    captcha_response = session.get(captcha_url, headers=headers, timeout=10)
+                    captcha_response = session.get(captcha_url, headers=headers, timeout=30)
                     if captcha_response.status_code == 200:
                         raw_captcha = ocr.classification(captcha_response.content)
                         captcha_text = re.sub(r'[^A-Za-z0-9]', '', raw_captcha).upper()
                         
                         if len(captcha_text) == 6:
                             break 
-                        time.sleep(0.2)
-                        
-                logger.info(f"Authentication attempt {attempt + 1}: Dispatching CAPTCHA resolution '{captcha_text}'")
+                    time.sleep(0.2)
+                    
+            logger.info(f"Authentication attempt {attempt + 1}: Dispatching CAPTCHA resolution '{captcha_text}'")
 
             data = {
                 'fnum': credentials.faculty_no,
@@ -178,7 +178,7 @@ def get_info(credentials: LoginData):
             else:
                 data['egn'] = credentials.auth_code
 
-            post_response = session.post(url, headers=headers, data=data, timeout=10)
+            post_response = session.post(url, headers=headers, data=data, timeout=30)
             post_response.encoding = 'utf-8'
 
             soup = BeautifulSoup(post_response.text, 'lxml')
@@ -224,7 +224,7 @@ def get_info(credentials: LoginData):
 
                 form_data['deistvie'] = '1'
                 
-                grades_response = session.post(action_url, headers=headers, data=form_data, timeout=10)
+                grades_response = session.post(action_url, headers=headers, data=form_data, timeout=30)
                 grades_response.encoding = 'utf-8'
                 grades_soup = BeautifulSoup(grades_response.text, 'lxml')
                 student_grades = parse_grades(grades_soup)
@@ -232,7 +232,7 @@ def get_info(credentials: LoginData):
                 student_dorm = {}
                 try:
                     form_data['deistvie'] = '7'
-                    dorm_response = session.post(action_url, headers=headers, data=form_data, timeout=10)
+                    dorm_response = session.post(action_url, headers=headers, data=form_data, timeout=30)
                     dorm_response.encoding = 'utf-8'
                     dorm_soup = BeautifulSoup(dorm_response.text, 'lxml')
                     student_dorm = parse_dormitory(dorm_soup)
@@ -280,7 +280,7 @@ def get_schedule():
         for faculty_id in range(1, 35):
             form_data = {"Faculty[id]": str(faculty_id)}
             try:
-                response = requests.post(url, headers=headers, data=form_data, timeout=10)
+                response = requests.post(url, headers=headers, data=form_data, timeout=30)
                 if response.status_code != 200:
                     continue
                 
