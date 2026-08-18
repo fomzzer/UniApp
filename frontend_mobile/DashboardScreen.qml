@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtQuick.Pdf
 import UniApp.Backend
 
 Page {
@@ -18,6 +17,14 @@ Page {
     property string scheduleErrorMsg: ""
     property bool hasScheduleError: false
 
+    function setFoundPdfUrl(url) {
+        dashboardPage.currentPdfUrl = url;
+        dashboardPage.hasScheduleError = false;
+        Qt.callLater(function() {
+            scheduleFlickable.contentY = Math.max(0, scheduleFlickable.contentHeight - scheduleFlickable.height);
+        });
+    }
+
     Connections {
         target: AuthManager
         function onAllSchedulesReceived(schedulesArray) {
@@ -29,17 +36,7 @@ Page {
 
             dashboardPage.autoSelectSchedule();
         }
-        function onPdfDownloaded(localPath) {
-            console.log("PDF успешно скачан! Путь:", localPath);
-            dashboardPage.currentPdfUrl = localPath;
-            dashboardPage.hasScheduleError = false;
-
-            Qt.callLater(function() {
-                scheduleFlickable.contentY = Math.max(0, scheduleFlickable.contentHeight - scheduleFlickable.height);
-            });
-        }
         function onScheduleError(errorMessage) {
-            console.error("Ошибка от C++ сервера:", errorMessage);
             dashboardPage.currentPdfUrl = "";
             dashboardPage.scheduleErrorMsg = errorMessage;
             dashboardPage.hasScheduleError = true;
@@ -48,11 +45,6 @@ Page {
 
     Component.onCompleted: {
         AuthManager.fetchAllSchedules();
-    }
-
-    PdfDocument {
-        id: schedulePdf
-        source: dashboardPage.currentPdfUrl
     }
 
     function getAcronym(text) {
@@ -103,8 +95,6 @@ Page {
         }
 
         if (bestMatch) {
-            console.log("Автоподбор: точное совпадение найдено: ", bestMatch.url);
-
             let facIdx = comboFac.find(bestMatch.faculty);
             if (facIdx !== -1) {
                 comboFac.currentIndex = facIdx;
@@ -120,115 +110,8 @@ Page {
                         let streamIdx = comboStream.find(bestMatch.stream);
                         if (streamIdx !== -1) {
                             comboStream.currentIndex = streamIdx;
-
-                            dashboardPage.hasScheduleError = false;
-                            AuthManager.downloadPdf(bestMatch.url);
+                            setFoundPdfUrl(bestMatch.url);
                         }
-                    }
-                }
-            }
-        } else {
-            console.log("Автоподбор: расписание не найдено для", facAcronym, specAcronym, sCourse, sStream);
-        }
-    }
-
-    Popup {
-        id: pdfFullScreenPopup
-        parent: Overlay.overlay
-        width: dashboardPage.width
-        height: dashboardPage.height
-        x: 0; y: 0
-        padding: 0
-        background: Rectangle { color: "#E60D1117" }
-
-        onOpened: {
-            if (typeof fsPdfContainer !== "undefined" && typeof fsWrapper !== "undefined") {
-                fsPdfContainer.scale = 1.0;
-                Qt.callLater(function() {
-                    fsPdfContainer.x = (fsWrapper.width - fsPdfContainer.width) / 2;
-                    fsPdfContainer.y = (fsWrapper.height - fsPdfContainer.height) / 2;
-                });
-            }
-        }
-
-        ColumnLayout {
-            anchors.fill: parent
-            spacing: 0
-
-            Rectangle {
-                Layout.fillWidth: true
-                height: 60
-                color: "#161B22"
-                border.color: "#30363D"
-                border.width: 1
-
-                Label {
-                    text: "Расписание"
-                    color: "#FFFFFF"
-                    font.pixelSize: 18
-                    font.bold: true
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
-                    anchors.leftMargin: 20
-                }
-
-                Button {
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.right: parent.right
-                    anchors.rightMargin: 10
-                    background: Rectangle { color: "transparent" }
-                    contentItem: Text {
-                        text: "Закрыть"
-                        color: "#ef4444"
-                        font.pixelSize: 16
-                        font.bold: true
-                    }
-                    onClicked: pdfFullScreenPopup.close()
-                }
-            }
-
-            Rectangle {
-                id: fsWrapper
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                color: "transparent"
-                clip: true
-
-                Item {
-                    id: fsPdfContainer
-
-                    property real pdfW: (schedulePdf.status === PdfDocument.Ready && schedulePdf.pagePointSize(0).width > 0) ? schedulePdf.pagePointSize(0).width : 1000
-                    property real pdfH: (schedulePdf.status === PdfDocument.Ready && schedulePdf.pagePointSize(0).height > 0) ? schedulePdf.pagePointSize(0).height : 1000
-                    property real fitScale: (fsWrapper.width > 0 && fsWrapper.height > 0) ? Math.min(fsWrapper.width / pdfW, fsWrapper.height / pdfH) * 0.98 : 1.0
-
-                    width: pdfW * fitScale
-                    height: pdfH * fitScale
-
-                    PdfPageView {
-                        id: fsPdfView
-                        document: schedulePdf
-                        enabled: false
-
-                        width: parent.width * 4.0
-                        height: parent.height * 4.0
-                        renderScale: parent.fitScale * 4.0
-                        scale: 0.25
-                        transformOrigin: Item.TopLeft
-                        x: 0
-                        y: 0
-                    }
-
-                    PinchArea {
-                        anchors.fill: parent
-                        pinch.target: fsPdfContainer
-                        pinch.minimumScale: 1.0
-                        pinch.maximumScale: 5.0
-                        pinch.minimumRotation: 0
-                        pinch.maximumRotation: 0
-                    }
-
-                    DragHandler {
-                        target: fsPdfContainer
                     }
                 }
             }
@@ -1034,41 +917,36 @@ Page {
                                 }
 
                                 onClicked: {
-                                    try {
-                                        let f = comboFac.currentText.toString().trim();
-                                        let s = comboSpec.currentText.toString().trim();
-                                        let c = comboCourse.currentText.toString().trim();
-                                        let st = comboStream.currentText.toString().trim();
+                                    let f = comboFac.currentText.toString().trim();
+                                    let s = comboSpec.currentText.toString().trim();
+                                    let c = comboCourse.currentText.toString().trim();
+                                    let st = comboStream.currentText.toString().trim();
 
-                                        if (f.indexOf("Выберите") !== -1 || s.indexOf("Выберите") !== -1 || c.indexOf("Выберите") !== -1 || st.indexOf("Выберите") !== -1 || f.indexOf("Загрузка") !== -1) {
-                                            dashboardPage.currentPdfUrl = "";
-                                            dashboardPage.scheduleErrorMsg = "Пожалуйста, выберите все параметры";
-                                            dashboardPage.hasScheduleError = true;
-                                            return;
-                                        }
+                                    if (f.indexOf("Выберите") !== -1 || s.indexOf("Выберите") !== -1 || c.indexOf("Выберите") !== -1 || st.indexOf("Выберите") !== -1 || f.indexOf("Загрузка") !== -1) {
+                                        dashboardPage.currentPdfUrl = "";
+                                        dashboardPage.scheduleErrorMsg = "Пожалуйста, выберите все параметры";
+                                        dashboardPage.hasScheduleError = true;
+                                        return;
+                                    }
 
-                                        let foundUrl = "";
-                                        for (let i = 0; i < dashboardPage.allSchedules.length; i++) {
-                                            let item = dashboardPage.allSchedules[i];
-                                            if (item.faculty.toString().trim() === f &&
-                                                item.speciality.toString().trim() === s &&
-                                                item.course.toString().trim() === c &&
-                                                item.stream.toString().trim() === st) {
-                                                foundUrl = item.url;
-                                                break;
-                                            }
+                                    let foundUrl = "";
+                                    for (let i = 0; i < dashboardPage.allSchedules.length; i++) {
+                                        let item = dashboardPage.allSchedules[i];
+                                        if (item.faculty.toString().trim() === f &&
+                                            item.speciality.toString().trim() === s &&
+                                            item.course.toString().trim() === c &&
+                                            item.stream.toString().trim() === st) {
+                                            foundUrl = item.url;
+                                            break;
                                         }
+                                    }
 
-                                        if (foundUrl !== "") {
-                                            dashboardPage.hasScheduleError = false;
-                                            AuthManager.downloadPdf(foundUrl);
-                                        } else {
-                                            dashboardPage.currentPdfUrl = "";
-                                            dashboardPage.scheduleErrorMsg = "Расписание для выбранных параметров не найдено";
-                                            dashboardPage.hasScheduleError = true;
-                                        }
-                                    } catch(e) {
-                                        console.error("Ошибка при обработке клика:", e);
+                                    if (foundUrl !== "") {
+                                        setFoundPdfUrl(foundUrl);
+                                    } else {
+                                        dashboardPage.currentPdfUrl = "";
+                                        dashboardPage.scheduleErrorMsg = "Расписание для выбранных параметров не найдено";
+                                        dashboardPage.hasScheduleError = true;
                                     }
                                 }
                             }
@@ -1077,7 +955,7 @@ Page {
 
                     Rectangle {
                         Layout.fillWidth: true
-                        Layout.minimumHeight: dashboardPage.currentPdfUrl === "" ? 200 : 450
+                        Layout.minimumHeight: dashboardPage.currentPdfUrl === "" ? 200 : 250
                         color: dashboardPage.currentPdfUrl === "" ? "transparent" : "#22272E"
                         radius: 12
                         border.color: "#373E47"
@@ -1120,70 +998,57 @@ Page {
                                 Item {
                                     anchors.fill: parent
 
-                                    Item {
-                                        property real pdfW: (schedulePdf.status === PdfDocument.Ready && schedulePdf.pagePointSize(0).width > 0) ? schedulePdf.pagePointSize(0).width : 1000
-                                        property real pdfH: (schedulePdf.status === PdfDocument.Ready && schedulePdf.pagePointSize(0).height > 0) ? schedulePdf.pagePointSize(0).height : 1000
-                                        property real fitScale: (parent.width > 0 && parent.height > 0) ? Math.min(parent.width / pdfW, parent.height / pdfH) * 0.98 : 1.0
-
-                                        width: pdfW * fitScale
-                                        height: pdfH * fitScale
+                                    ColumnLayout {
                                         anchors.centerIn: parent
+                                        spacing: 20
 
-                                        PdfPageView {
-                                            id: previewView
-                                            document: schedulePdf
-                                            enabled: false
+                                        Rectangle {
+                                            Layout.alignment: Qt.AlignHCenter
+                                            width: 60; height: 60; radius: 30
+                                            color: "#CC1C2128"
+                                            border.color: "#2ea043"
+                                            border.width: 2
 
-                                            width: parent.width * 4.0
-                                            height: parent.height * 4.0
-                                            renderScale: parent.fitScale * 4.0
-                                            scale: 0.25
-                                            transformOrigin: Item.TopLeft
-                                            x: 0
-                                            y: 0
+                                            Label {
+                                                anchors.centerIn: parent
+                                                text: "📄"
+                                                font.pixelSize: 30
+                                            }
                                         }
-                                    }
-
-                                    BusyIndicator {
-                                        anchors.centerIn: parent
-                                        running: schedulePdf.status === PdfDocument.Loading
-                                    }
-
-                                    Label {
-                                        anchors.centerIn: parent
-                                        text: "Ошибка при чтении PDF"
-                                        color: "#ef4444"
-                                        font.pixelSize: 15
-                                        visible: schedulePdf.status === PdfDocument.Error
-                                    }
-
-                                    Rectangle {
-                                        anchors.centerIn: parent
-                                        width: 100; height: 40
-                                        radius: 20
-                                        color: "#CC1C2128"
-                                        border.color: "#373E47"
-                                        border.width: 1
-                                        visible: schedulePdf.status === PdfDocument.Ready
 
                                         Label {
-                                            anchors.centerIn: parent
-                                            text: "Открыть"
-                                            font.pixelSize: 14
+                                            text: "Успешно загружено!"
+                                            color: "#2ea043"
+                                            font.pixelSize: 18
                                             font.bold: true
-                                            color: "#58A6FF"
+                                            Layout.alignment: Qt.AlignHCenter
                                         }
 
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            cursorShape: Qt.PointingHandCursor
+                                        Button {
+                                            text: "Открыть на весь экран"
+                                            Layout.alignment: Qt.AlignHCenter
+                                            Layout.topMargin: 10
+                                            Layout.preferredWidth: 240
+                                            Layout.preferredHeight: 50
+
+                                            background: Rectangle {
+                                                color: parent.pressed ? "#1557B0" : "#1F6FEB"
+                                                radius: 8
+                                            }
+
+                                            contentItem: Text {
+                                                text: parent.text
+                                                color: "#FFFFFF"
+                                                font.pixelSize: 15
+                                                font.bold: true
+                                                horizontalAlignment: Text.AlignHCenter
+                                                verticalAlignment: Text.AlignVCenter
+                                            }
+
                                             onClicked: {
-                                                if (typeof fsPdfContainer !== "undefined" && typeof fsWrapper !== "undefined") {
-                                                    fsPdfContainer.scale = 1.0;
-                                                    fsPdfContainer.x = (fsWrapper.width - fsPdfContainer.width) / 2;
-                                                    fsPdfContainer.y = (fsWrapper.height - fsPdfContainer.height) / 2;
+                                                if (dashboardPage.currentPdfUrl !== "") {
+                                                    Qt.openUrlExternally(dashboardPage.currentPdfUrl);
                                                 }
-                                                pdfFullScreenPopup.open();
                                             }
                                         }
                                     }

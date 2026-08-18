@@ -3,8 +3,6 @@
 #include <QJsonObject>
 #include <QNetworkRequest>
 #include <QUrl>
-#include <QFile>
-#include <QStandardPaths>
 #include <QSslConfiguration>
 #include <QSslSocket>
 
@@ -20,9 +18,6 @@ AuthManager::AuthManager(QObject *parent)
 
     scheduleNetworkManager = new QNetworkAccessManager(this);
     connect(scheduleNetworkManager, &QNetworkAccessManager::finished, this, &AuthManager::onScheduleResponse);
-
-    pdfManager = new QNetworkAccessManager(this);
-    connect(pdfManager, &QNetworkAccessManager::finished, this, &AuthManager::onPdfResponse);
 }
 
 bool AuthManager::isLoading() const { return m_isLoading; }
@@ -116,40 +111,5 @@ void AuthManager::onScheduleResponse(QNetworkReply* reply) {
     } else {
         emit scheduleError("Сервер вернул некорректный формат расписания");
     }
-    reply->deleteLater();
-}
-
-void AuthManager::downloadPdf(const QString &urlStr) {
-    setScheduleLoading(true);
-    QUrl url(urlStr);
-    QNetworkRequest request(url);
-
-    request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
-
-    pdfManager->get(request);
-}
-
-void AuthManager::onPdfResponse(QNetworkReply* reply) {
-    setScheduleLoading(false);
-
-    if (reply->error() != QNetworkReply::NoError) {
-        emit scheduleError("Ошибка загрузки файла: " + reply->errorString());
-        reply->deleteLater();
-        return;
-    }
-
-    QString tempPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/current_schedule.pdf";
-    QFile file(tempPath);
-
-    if (file.open(QIODevice::WriteOnly)) {
-        file.write(reply->readAll());
-        file.close();
-
-        QString safeUrl = QUrl::fromLocalFile(tempPath).toString();
-        emit pdfDownloaded(safeUrl);
-    } else {
-        emit scheduleError("Не удалось сохранить PDF на устройство");
-    }
-
     reply->deleteLater();
 }

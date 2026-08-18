@@ -22,8 +22,6 @@ public:
     Q_INVOKABLE void login(const QString &facultyNo, const QString &authCode);
     Q_INVOKABLE void fetchAllSchedules();
 
-    Q_INVOKABLE void downloadPdf(const QString &urlStr);
-
 signals:
     void isLoadingChanged();
     void isScheduleLoadingChanged();
@@ -34,17 +32,13 @@ signals:
     void allSchedulesReceived(const QJsonArray &schedules);
     void scheduleError(const QString &errorMessage);
 
-    void pdfDownloaded(const QString &localPath);
-
 private slots:
     void onServerResponse(QNetworkReply* reply);
     void onScheduleResponse(QNetworkReply* reply);
-    void onPdfResponse(QNetworkReply* reply);
 
 private:
     QNetworkAccessManager *networkManager;
     QNetworkAccessManager *scheduleNetworkManager;
-    QNetworkAccessManager *pdfManager;
 
     bool m_isLoading;
     bool m_isScheduleLoading;
