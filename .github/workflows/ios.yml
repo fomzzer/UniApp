@@ -1,0 +1,38 @@
+name: iOS Build
+
+on:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: macos-13
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: '6.6.0'
+        target: 'ios'
+        modules: 'qtnetworkauth qtpositioning qtwebchannel qtwebengine'
+
+    - name: Build and Package
+      run: |
+        mkdir build && cd build
+        cmake -G Xcode -DCMAKE_SYSTEM_NAME=iOS ..
+        xcodebuild -project uniapp_mobile.xcodeproj -scheme appuniapp_mobile -configuration Release CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY=""
+        
+    - name: Create IPA
+      run: |
+        mkdir Payload
+        cp -r build/Release-iphoneos/appuniapp_mobile.app Payload/
+        zip -r UniApp.ipa Payload
+        
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: UniApp-iOS
+        path: UniApp.ipa
