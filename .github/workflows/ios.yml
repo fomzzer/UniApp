@@ -20,18 +20,20 @@ jobs:
 
     - name: Build and Package
       run: |
+        cd frontend_mobile
         mkdir build && cd build
         cmake -G Xcode -DCMAKE_SYSTEM_NAME=iOS ..
         xcodebuild -project uniapp_mobile.xcodeproj -scheme appuniapp_mobile -configuration Release CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY=""
         
     - name: Create IPA
       run: |
+        cd frontend_mobile/build
         mkdir Payload
-        cp -r build/Release-iphoneos/appuniapp_mobile.app Payload/
+        cp -r Release-iphoneos/appuniapp_mobile.app Payload/
         zip -r UniApp.ipa Payload
         
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: UniApp-iOS
-        path: UniApp.ipa
+        path: frontend_mobile/build/UniApp.ipa
