@@ -12,7 +12,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Install Qt
+    - name: Install Qt Host (macOS)
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: '6.6.0'
+        target: 'desktop'
+
+    - name: Install Qt Target (iOS)
       uses: jurplel/install-qt-action@v3
       with:
         version: '6.6.0'
