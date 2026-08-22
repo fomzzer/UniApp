@@ -15,13 +15,13 @@ jobs:
     - name: Install Qt Host (macOS)
       uses: jurplel/install-qt-action@v3
       with:
-        version: '6.6.0'
+        version: '6.10.0'
         target: 'desktop'
 
     - name: Install Qt Target (iOS)
       uses: jurplel/install-qt-action@v3
       with:
-        version: '6.6.0'
+        version: '6.10.0'
         target: 'ios'
 
     - name: Build and Package
@@ -29,7 +29,7 @@ jobs:
         cd frontend_mobile
         mkdir build && cd build
         
-        ${{ runner.workspace }}/Qt/6.6.0/ios/bin/qt-cmake -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DQT_HOST_PATH=${{ runner.workspace }}/Qt/6.6.0/macos ..
+        ${{ runner.workspace }}/Qt/6.10.0/ios/bin/qt-cmake -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DQT_HOST_PATH=${{ runner.workspace }}/Qt/6.10.0/macos ..
         
         xcodebuild -project uniapp_mobile.xcodeproj -scheme appuniapp_mobile -configuration Release CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY=""
         
