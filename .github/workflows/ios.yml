@@ -22,7 +22,7 @@ jobs:
       run: |
         cd frontend_mobile
         mkdir build && cd build
-        cmake -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_PREFIX_PATH=$Qt6_DIR ..
+        qt-cmake -G Xcode -DCMAKE_SYSTEM_NAME=iOS ..
         xcodebuild -project uniapp_mobile.xcodeproj -scheme appuniapp_mobile -configuration Release CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY=""
         
     - name: Create IPA
