@@ -17,7 +17,6 @@ jobs:
       with:
         version: '6.6.0'
         target: 'ios'
-        modules: 'qtnetworkauth qtpositioning qtwebchannel qtwebengine'
 
     - name: Build and Package
       run: |
