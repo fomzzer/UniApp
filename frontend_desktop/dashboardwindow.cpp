@@ -9,12 +9,15 @@
 #include <QSet>
 #include <QMessageBox>
 #include <QSettings>
+#include <QIcon>
 
 DashboardWindow::DashboardWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::DashboardWindow)
 {
     ui->setupUi(this);
+
+    this->setWindowIcon(QIcon("://assets/logodesc.png"));
 
     ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 

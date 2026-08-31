@@ -31,3 +31,5 @@ DISTFILES += \
     ../backend/full_scraper.py \
     ../backend/scraper.py \
     scraper.py
+
+win32: RC_FILE = uniapp.rc

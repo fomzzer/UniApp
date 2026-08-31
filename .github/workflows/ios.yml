@@ -1,0 +1,47 @@
+name: iOS Build
+
+on:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Qt Host (macOS)
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: '6.10.0'
+        target: 'desktop'
+
+    - name: Install Qt Target (iOS)
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: '6.10.0'
+        target: 'ios'
+
+    - name: Build and Package
+      run: |
+        cd frontend_mobile
+        mkdir build && cd build
+        
+        ${{ runner.workspace }}/Qt/6.10.0/ios/bin/qt-cmake -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DQT_HOST_PATH=${{ runner.workspace }}/Qt/6.10.0/macos ..
+        
+        xcodebuild -project uniapp_mobile.xcodeproj -scheme appuniapp_mobile -configuration Release CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY=""
+        
+    - name: Create IPA
+      run: |
+        cd frontend_mobile/build
+        mkdir Payload
+        cp -r Release-iphoneos/UniApp.app Payload/
+        zip -r UniApp.ipa Payload
+        
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: UniApp-iOS
+        path: frontend_mobile/build/UniApp.ipa
